@@ -98,6 +98,7 @@ def compare_recipes(recipe1:list, recipe2:list) -> str:
     firstRecipeList = []
     secondRecipeList = []
 
+    # TODO need to find ways to link ingredients together
     for item in recipe1:
         firstRecipeList.append(normalize_ingredients(item))
 
