@@ -1,5 +1,6 @@
 import os
 import nltk
+import json
 
 # 1. Force NLTK to use ONLY your local project folder
 # This 'NLTK_DATA' environment variable is the strongest way to redirect it
@@ -24,42 +25,67 @@ from ingredient_parser import parse_ingredient
 ureg = UnitRegistry()
 
 ingredients1 = ['1 cup (120g) fine cornmeal', '1 cup (125g) all-purpose flour (spooned & leveled)', '1 teaspoon baking powder', '1/2 teaspoon baking soda', '1/8 teaspoon salt', '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled', '1/3 cup (67g) packed light or dark brown sugar', '2 Tablespoons (30ml) honey', '1 large egg, at room temperature', '1 cup (240ml) buttermilk, at room temperature*']
-ingredients2 = ['2 cups flour', '1 cup cornmeal', '1 cup sugar', '1 ½ tablespoons baking powder', '1 teaspoon salt', '½ cup (8 tablespoons) butter (melted)', '½ cup oil', '1 ¼ cups milk', '3 large eggs', 'honey and extra butter for serving (optional)']
+ingredients2 = ['2 ½ cups flour', '1 cup cornmeal', '1 cup sugar', '1 ½ tablespoons baking powder', '1 teaspoon salt', '½ cup (8 tablespoons) butter (melted)', '½ cup oil', '1 ¼ cups milk', '3 large eggs', 'honey and extra butter for serving (optional)']
 ingredients3 = ['1 cup all-purpose flour', '1 cup yellow cornmeal', '0.66666668653488 cup white sugar', '3.5 teaspoons baking powder', '1 teaspoon salt', '1 cup milk', '0.33333334326744 cup vegetable oil', '1 large egg']
 
+def load_densities(filename="ingredient_densities.json"):
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"{filename} does not exist, cannot use a density table")
+        return {}
+
+DENSITIES = load_densities()
+
+def get_density_for_ingredient(ingredient:str) -> int | None:
+    try:
+        density = DENSITIES[ingredient.lower()]
+        return density
+    except IndexError:
+        sortedKeys = sorted(DENSITIES.keys(), key=len, reverse=True)
+        for key in sortedKeys:
+            if key in ingredient.lower():
+                return DENSITIES[key]
+        return None
 
 def normalize_ingredients(raw_string):
-    parsed = parse_ingredient(raw_string)
-
-    if not parsed.amount:
-        return f"No quantity found: {raw_string}"
-
-    first_item = parsed.amount[0]
-
-    # 1. Access quantity (text)
-    qty_str = first_item.quantity
-
-    # 2. Get the unit as a string (e.g., 'cup' or 'pound')
-    # Using str() is the most reliable way to extract the name from the Unit object
-    unit_str = str(first_item.unit)
-
     try:
-        # 3. Clean fractions
-        qty = (qty_str.replace('½', '.5')
-               .replace('¼', '.25')
-               .replace('¾', '.75')
-               .replace('1 ½', '1.5')
-               .replace('1 ¼', '1.25'))
-        qty = "".join(qty.split())
+        parsed = parse_ingredient(raw_string)
 
-        # 4. Pint Math
-        measure = ureg(f"{qty} {unit_str}")
+        if not parsed.amount:
+            return f"No quantity found: {raw_string}"
+
+        first_item = parsed.amount[0]
+
+        # 1. Access quantity (text)
+        qty_str = first_item.quantity
+
+        unit_str = str(first_item.unit)
+        ingredient = parsed.name[0].text
+        measure = ureg(f"{qty_str} {unit_str}")
 
         # Check if it's volume or mass to decide the output unit
-        if measure.check('[mass]'):
-            return f"{measure.to('grams'):.2f} g"
+        # if measure.check('[mass]'):
 
-        return f"{measure.to('ml'):.2f} ml"
+        if measure.check('[mass]'):
+            return f"{measure.to('g'):.1f} g"
+
+        elif str(measure.dimensionality) == 'dimensionless':
+            return measure
+
+        elif measure.check('[volume]'):
+            densityValue = get_density_for_ingredient(ingredient)
+
+            if densityValue:
+                density = ureg.Quantity(densityValue, "gram / cup")
+                mass = measure * density
+                return f"{mass.to('g'):.1f} g"
+            else:
+                water_density = ureg.Quantity(240, "gram / cup")
+                mass = measure * water_density
+                return f"{mass.to('g'):.1f} g (estimated via water density)"
+
 
     except Exception as e:
         # This catch helps if Pint doesn't recognize a unit like 'large' for eggs
@@ -67,3 +93,5 @@ def normalize_ingredients(raw_string):
 
 for item in ingredients2:
     print(f"Original: {item} -> Normalized {normalize_ingredients(item)}")
+
+
