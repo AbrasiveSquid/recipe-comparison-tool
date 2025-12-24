@@ -68,9 +68,9 @@ def normalize_ingredients(raw_string):
         # Check if it's volume or mass to decide the output unit
         # if measure.check('[mass]'):
         if not unit_str:
-            return f"{measure} {ingredient}"
+            return ingredient, f"{measure}"
         elif measure.check('[mass]'):
-            return f"{measure.to('g'):.1f}"
+            return ingredient, f"{measure.to('g'):.1f}"
 
         elif str(measure.dimensionality) == 'dimensionless':
             return measure
@@ -81,11 +81,11 @@ def normalize_ingredients(raw_string):
             if densityValue:
                 density = ureg.Quantity(densityValue, "gram / cup")
                 mass = measure * density
-                return f"{mass.to('g'):.1f}"
+                return ingredient, f"{mass.to('g'):.1f}"
             else:
                 water_density = ureg.Quantity(240, "gram / cup")
                 mass = measure * water_density
-                return f"{mass.to('g'):.1f} (estimated via water density)"
+                return ingredient, f"{mass.to('g'):.1f}"
         else:
             raise Exception
 
@@ -93,7 +93,34 @@ def normalize_ingredients(raw_string):
         # This catch helps if Pint doesn't recognize a unit like 'large' for eggs
         return f"Unconvertible: {qty_str} {unit_str}"
 
-for item in ingredients1:
-    print(f"Original: {item} -> Normalized {normalize_ingredients(item)}")
+
+def compare_recipes(recipe1:list, recipe2:list) -> str:
+    firstRecipeList = []
+    secondRecipeList = []
+
+    for item in recipe1:
+        firstRecipeList.append(normalize_ingredients(item))
+
+    for item in recipe2:
+        secondRecipeList.append(normalize_ingredients(item))
+
+    print(firstRecipeList)
+    print(secondRecipeList)
+    print("Recipe 1\t\t\t\t\t\t\t\tRecipe2")
+    n = len(firstRecipeList)
+    m = len(secondRecipeList)
+    i = 0
+    while i < n and i < m:
+        print(f"{firstRecipeList[i][0]}: {firstRecipeList[i][1]}\t\t\t\t\t\t{secondRecipeList[i][0]}: {secondRecipeList[i][1]}")
+        i += 1
+    while i < n:
+        print(f"{firstRecipeList[i][0]}: {firstRecipeList[i][1]}")
+        i += 1
+    while i < m:
+        print(f"\t\t\t\t\t\t\t{secondRecipeList[i][0]}: {secondRecipeList[i][1]}")
+        i += 1
+
+
+compare_recipes(ingredients1, ingredients2)
 
 
