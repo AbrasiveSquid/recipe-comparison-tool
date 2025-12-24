@@ -49,6 +49,7 @@ def get_density_for_ingredient(ingredient:str) -> int | None:
                 return DENSITIES[key]
         return None
 
+# TODO ADD THIS TO RECIPE CLASS
 def normalize_ingredients(raw_string):
     try:
         parsed = parse_ingredient(raw_string)

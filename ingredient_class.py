@@ -4,7 +4,7 @@ class Ingredient:
     represents an ingredient in a recipe
     """
 
-    def __init__(self, name, amount, measure, type=None):
+    def __init__(self, name, amount, measure, ingState=None):
         """
         constructor class
 
@@ -20,8 +20,8 @@ class Ingredient:
                 example: g or ml or '' if dimenionless for ingredient such as
                 1 egg
 
-            type: str:
-                possible type is solid or liquid or None
+            ingState: str:
+                possible ingState is solid or liquid or None
                 used for determining possible conversion options
 
         """
@@ -29,13 +29,11 @@ class Ingredient:
         self._amount = amount
         self._measure = measure
         self._type = None
+        self._density = None
+        self._state = ingState
 
-        if type is None:
-            density = None
-        else:
-            density = self._get_density_for_ingredient()
+        self._set_density_and_state_for_ingredient()
 
-        self._density = density
 
     def name(self) -> str:
         return self._name
@@ -44,7 +42,7 @@ class Ingredient:
         if not isinstance(newName, str):
             raise TypeError(f"newName must be a str but is a {type(newName)}")
         self._name = self._clean_name(newName)
-        self._update_density()
+        self._set_density_and_state_for_ingredient()
 
     def amount(self) -> int | float:
         return self._amount
@@ -77,28 +75,27 @@ class Ingredient:
             print(f"{filename} does not exist, cannot use a density table")
             return {}
 
-    def _get_density_for_ingredient(self) -> int | None:
+    def _set_density_and_state_for_ingredient(self) -> None:
         """
-        internal method to get ingredient density
-        returns the density as g/cup as an int if ingredient in json file
-        otherwise returns None
+        internal method to set ingredient density and state
+        sets self._density as the density as g/cup as an int if ingredient in
+        json file. Sets the self._state to 'solid' or 'liquid'
         """
         DENSITIES = self._load_densities()
         try:
-            density = DENSITIES[self._name]
-            return density
+            ingDetails = DENSITIES[self._name]
+            self._density = ingDetails['density']
+            self._statex     = ingDetails['state']
+
         except KeyError:
             sortedKeys = sorted(DENSITIES.keys(), key=len, reverse=True)
             for key in sortedKeys:
-                if key in self._name.lower():
-                    return DENSITIES[key]
-            return None
-
-    def _update_density(self) -> None:
-        """
-        internal method that updates the density of the ingredient
-        """
-        self._density = self._get_density_for_ingredient()
+                if key in self._name:
+                    ingDetails = DENSITIES[key]
+                    self._density = ingDetails['density']
+                    self._state = ingDetails['state']
+                    return
+            return
 
     def _clean_name(self, name:str) -> str:
         """
