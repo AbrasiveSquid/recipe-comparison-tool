@@ -22,3 +22,9 @@ class TestRecipeComparison(unittest.TestCase):
 
         self.flour2.set_name('ALL-PURPOSE_FLOuR')
         self.assertEqual(self.flour2.name(), 'all purpose flour')
+
+    def test_update_density(self):
+        self.assertEqual(self.flour._density, 125)
+        self.flour.set_name('bread flour')
+        self.assertEqual(self.flour.name(), 'bread flour')
+        self.assertEqual(self.flour._density, 136)

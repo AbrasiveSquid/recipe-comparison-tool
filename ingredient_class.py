@@ -44,6 +44,7 @@ class Ingredient:
         if not isinstance(newName, str):
             raise TypeError(f"newName must be a str but is a {type(newName)}")
         self._name = self._clean_name(newName)
+        self._update_density()
 
     def amount(self) -> int | float:
         return self._amount
@@ -92,6 +93,12 @@ class Ingredient:
                 if key in self._name.lower():
                     return DENSITIES[key]
             return None
+
+    def _update_density(self) -> None:
+        """
+        internal method that updates the density of the ingredient
+        """
+        self._density = self._get_density_for_ingredient()
 
     def _clean_name(self, name:str) -> str:
         """
