@@ -42,7 +42,7 @@ def get_density_for_ingredient(ingredient:str) -> int | None:
     try:
         density = DENSITIES[ingredient.lower()]
         return density
-    except IndexError:
+    except KeyError:
         sortedKeys = sorted(DENSITIES.keys(), key=len, reverse=True)
         for key in sortedKeys:
             if key in ingredient.lower():
@@ -67,9 +67,10 @@ def normalize_ingredients(raw_string):
 
         # Check if it's volume or mass to decide the output unit
         # if measure.check('[mass]'):
-
-        if measure.check('[mass]'):
-            return f"{measure.to('g'):.1f} g"
+        if not unit_str:
+            return f"{measure} {ingredient}"
+        elif measure.check('[mass]'):
+            return f"{measure.to('g'):.1f}"
 
         elif str(measure.dimensionality) == 'dimensionless':
             return measure
@@ -80,18 +81,19 @@ def normalize_ingredients(raw_string):
             if densityValue:
                 density = ureg.Quantity(densityValue, "gram / cup")
                 mass = measure * density
-                return f"{mass.to('g'):.1f} g"
+                return f"{mass.to('g'):.1f}"
             else:
                 water_density = ureg.Quantity(240, "gram / cup")
                 mass = measure * water_density
-                return f"{mass.to('g'):.1f} g (estimated via water density)"
-
+                return f"{mass.to('g'):.1f} (estimated via water density)"
+        else:
+            raise Exception
 
     except Exception as e:
         # This catch helps if Pint doesn't recognize a unit like 'large' for eggs
         return f"Unconvertible: {qty_str} {unit_str}"
 
-for item in ingredients2:
+for item in ingredients1:
     print(f"Original: {item} -> Normalized {normalize_ingredients(item)}")
 
 
