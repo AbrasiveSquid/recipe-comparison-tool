@@ -43,7 +43,7 @@ class Ingredient:
     def set_name(self, newName:str) -> None:
         if not isinstance(newName, str):
             raise TypeError(f"newName must be a str but is a {type(newName)}")
-        self._name = newName
+        self._name = self._clean_name(newName)
 
     def amount(self) -> int | float:
         return self._amount
@@ -106,7 +106,9 @@ class Ingredient:
 
         cleanName = ''
         for char in name:
-            if char.isalpha():
+            if char.isalpha() or char == ' ':
                 cleanName += char.lower()
-
+            elif char == '-' or char == '_':
+                cleanName += ' '
         return cleanName
+

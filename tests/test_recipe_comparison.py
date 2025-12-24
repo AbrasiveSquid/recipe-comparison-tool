@@ -12,3 +12,13 @@ class TestRecipeComparison(unittest.TestCase):
         self.assertEqual(self.flour.amount(), 1)
         self.assertEqual(self.flour.measure(), 'cup' )
         self.assertEqual(self.flour._density, 125)
+
+    def test_clean_name(self):
+        self.flour2 = Ingredient('flour2', 1, 'cup', 'solid')
+        self.assertEqual(self.flour2.name(), 'flour')
+
+        self.flour2.set_name('all-purpose-flour')
+        self.assertEqual(self.flour2.name(), 'all purpose flour')
+
+        self.flour2.set_name('ALL-PURPOSE_FLOuR')
+        self.assertEqual(self.flour2.name(), 'all purpose flour')
