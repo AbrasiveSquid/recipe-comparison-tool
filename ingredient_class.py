@@ -12,12 +12,13 @@ class Ingredient:
             name: str:
                 name of the ingredient
 
-            amount: int or float:
+            amount: int or float or unicode fraction str:
                 the mass or volume or count of the ingredient
+                if a unicode fraction, only accepts '¼', '½', '¾', '⅓', '⅔'
 
             measure: str:
                 the measurement unit of the ingredient.
-                example: g or ml or '' if dimenionless for ingredient such as
+                example: g or ml or '' if dimensionless for ingredient such as
                 1 egg
 
             ingState: str:
@@ -26,14 +27,50 @@ class Ingredient:
 
         """
         self._name = self._clean_name(name)
+        # self._amount = self._verify_amount(amount)
         self._amount = amount
+        # self._measure = self._verify_measure(measure)
         self._measure = measure
-        self._type = None
         self._density = None
+        # self._state = self._verify_state(ingState)
         self._state = ingState
 
         self._set_density_and_state_for_ingredient()
 
+    def _verify_amount(self, amount: str | int | float) -> int | float:
+        """
+        verifies that the amount if an acceptable attribute for self._amount
+        If amount is a unicode fraction character it will be converted to float
+
+        Precondition:
+            amount must be an int, float, or unicode fraction str character
+        Raises:
+            ValueError:
+                if amount is not a correct value
+            TypeError:
+                if amount is not a correct type
+        """
+        if type(amount) == int or type(amount) == float:
+            return round(amount, 2)
+
+        if not isinstance(amount, str):
+            raise TypeError("amount must be a float, int, or unicode character"
+                            f" of a fractin but is a {type(amount)}")
+
+        match amount:
+            case '¼':
+                return 0.25
+            case '½':
+                return 0.5
+            case '¾':
+                return 0.75
+            case '⅓':
+                return round(1/3, 2)
+            case '⅔':
+                return round(2/3, 2)
+            case _: # default value
+                raise ValueError(f"{amount} is not a recognized ingredient "
+                                 "amount")
 
     def name(self) -> str:
         return self._name
@@ -85,7 +122,7 @@ class Ingredient:
         try:
             ingDetails = DENSITIES[self._name]
             self._density = ingDetails['density']
-            self._statex     = ingDetails['state']
+            self._state = ingDetails['state']
 
         except KeyError:
             sortedKeys = sorted(DENSITIES.keys(), key=len, reverse=True)
@@ -115,4 +152,54 @@ class Ingredient:
             elif char == '-' or char == '_':
                 cleanName += ' '
         return cleanName
+
+    def to_kitchen_measurement(self) -> str:
+        """
+        returns a string of the measurement with number of cups or tablespoons
+        or teaspoons depending on the amount
+        # TODO figure out cutoff amount
+        """
+        if self._measure == 'cup':
+            return f"{self._amount} {self._measure}"
+        elif self._measure == 'g' or self._measure == 'ml':
+            amount, measure = self._convert_to_metric()
+
+    def _convert_to_metric(self) -> tuple:
+        """
+        converts ingredient amount and measure to metric units.
+        Example 1 cup of flour will convert to 125 g
+
+        Returns:
+            tuple of strings in order of (amount, measure)
+
+        Precondition:
+            self._measure but be either `cup` or `tablespoon` or `teaspoon`
+
+        Raises:
+            ValueError:
+                if self._measure not the correct value
+        """
+        KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
+        if self._measure not in KITCHEN_MEASURES:
+            raise ValueError("self._measure must be 'cup' or 'tablespoon' or"
+                             f"'teaspoon', but is {self._measure}")
+
+        amount = self._amount * self._density
+        if self._state == 'solid':
+            return (amount, 'g')
+        elif self._state == 'liquid':
+            return (amount, 'ml')
+        else:
+            raise ValueError("self._state must be either 'solid' or liquid' "
+                             f"but is {self._state}")
+
+
+
+    def to_metric(self) -> str:
+        """
+        returns a string of the measurement in g (grams) if self._state is
+        'solid' or mL if self._state is 'liquid'
+        """
+        pass
+
 

@@ -3,10 +3,12 @@ import unittest
 from ingredient_class import Ingredient
 
 
-class TestRecipeComparison(unittest.TestCase):
+class TestIngredientComparison(unittest.TestCase):
     def setUp(self):
         self.flour = Ingredient('flour', 1, 'cup')
         self.extraDarkBrownSugar = Ingredient('extra Dark-Brown sugar', 1, 'cup')
+        # self.vegOil = Ingredient('vegetable oil', '½', 'cup')
+        self.butter = Ingredient('butter', 2, 'tablespoon')
 
     def test_ingredient_init(self):
         # flour test
@@ -20,6 +22,24 @@ class TestRecipeComparison(unittest.TestCase):
         self.assertEqual(self.extraDarkBrownSugar.amount(), 1)
         self.assertEqual(self.extraDarkBrownSugar.measure(), 'cup')
         self.assertEqual(self.extraDarkBrownSugar._density, 230)
+
+    def test_verify_amount(self):
+        self.assertEqual(self.flour._verify_amount(10), 10)
+        self.assertEqual(self.flour._verify_amount(10.5), 10.5)
+        self.assertEqual(self.flour._verify_amount(0.32223), 0.32)
+        self.assertEqual(self.flour._verify_amount(0.545), 0.55)
+        self.assertEqual(self.flour._verify_amount('¼'), 0.25)
+        self.assertEqual(self.flour._verify_amount('¾'), 0.75)
+        self.assertEqual(self.flour._verify_amount('½'), 0.5)
+        self.assertEqual(self.flour._verify_amount('⅓'), 0.33)
+        self.assertEqual(self.flour._verify_amount('⅔'), 0.67)
+
+        # incorrect types or values raise error
+        with self.assertRaises(TypeError):
+            self.flour._verify_amount([10])
+
+        with self.assertRaises(ValueError):
+            self.flour._verify_amount('1')
 
     def test_clean_name(self):
         self.flour2 = Ingredient('flour2', 1, 'cup', 'solid')
@@ -37,4 +57,12 @@ class TestRecipeComparison(unittest.TestCase):
         self.assertEqual(self.flour.name(), 'bread flour')
         self.assertEqual(self.flour._density, 136)
 
+    def test_convert_to_metric(self):
+        # solid conversion
+        self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
 
+        # liquid conversion
+        # self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
+
+    def test_to_kitchen_measurement(self):
+        self.assertEqual(self.flour.to_kitchen_measurement(), '1 cup')
