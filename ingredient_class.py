@@ -228,8 +228,21 @@ class Ingredient:
         """
         if self._measure == 'cup':
             return f"{self._amount} {self._measure}"
+        # TODO NEED TO FIGURE OUT TEASPOON AND TABLESPOON return
         elif self._measure == 'g' or self._measure == 'ml':
+            amount, measure = self._convert_to_kitchen()
+
+    def to_metric(self) -> str:
+        """
+        returns a string of the measurement in g (grams) if self._state is
+        'solid' or mL if self._state is 'liquid'
+        """
+        measure = self._measure
+        if measure == 'ml' or measure == 'g':
+            return f"{self._amount} {measure}"
+        elif measure == 'cup' or measure == 'teaspoon':
             amount, measure = self._convert_to_metric()
+            return f"{amount} {measure}"
 
     def _convert_to_metric(self) -> tuple:
         """
@@ -252,21 +265,16 @@ class Ingredient:
                              f"'teaspoon', but is {self._measure}")
 
         amount = self._amount * self._density
+        if int(amount) == amount:
+            amount = int(amount)
+
         if self._state == 'solid':
-            return (amount, 'g')
+            return amount, 'g'
         elif self._state == 'liquid':
-            return (amount, 'ml')
+            return amount, 'ml'
         else:
             raise ValueError("self._state must be either 'solid' or liquid' "
                              f"but is {self._state}")
 
-
-
-    def to_metric(self) -> str:
-        """
-        returns a string of the measurement in g (grams) if self._state is
-        'solid' or mL if self._state is 'liquid'
-        """
-        pass
 
 

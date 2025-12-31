@@ -1,9 +1,7 @@
 Next steps: 
 Add ingredient class
-  methods to convert between g, ml
-  attribute for solid or liquid 
-  density attribute
-  alternative names 
-    need list of equivalents
+  need to finish method to convert between
+metric and kitchen measurements and finsih adding
+tests. 90% ish completed class
 
 Add recipe class 

@@ -112,9 +112,12 @@ class TestIngredientComparison(unittest.TestCase):
     def test_convert_to_metric(self):
         # solid conversion
         self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
-
+        # TODO Test for teaspoons/tablespoon amounts
         # liquid conversion
         self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
 
+    def test_to_metric(self):
+        self.assertEqual(self.flour.to_metric(), '125 g')
+        self.assertEqual(self.vegOil.to_metric(), '109 ml')
     def test_to_kitchen_measurement(self):
         self.assertEqual(self.flour.to_kitchen_measurement(), '1 cup')
