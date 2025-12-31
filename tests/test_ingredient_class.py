@@ -23,6 +23,16 @@ class TestIngredientComparison(unittest.TestCase):
         self.assertEqual(self.extraDarkBrownSugar.measure(), 'cup')
         self.assertEqual(self.extraDarkBrownSugar._density, 230)
 
+        # test kilogram to gram conversion
+        kiloFlour = Ingredient('flour', 1, 'kg')
+        self.assertEqual(kiloFlour.amount(), 1000)
+        self.assertEqual(kiloFlour.measure(), 'g')
+
+        # test litre to ml conversion
+        litreWater = Ingredient('water', 2.5, 'l')
+        self.assertEqual(litreWater.amount(), 2500)
+        self.assertEqual(litreWater.measure(), 'ml')
+
     def test_verify_amount(self):
         self.assertEqual(self.flour._verify_amount(10), 10)
         self.assertEqual(self.flour._verify_amount(10.5), 10.5)
@@ -40,6 +50,32 @@ class TestIngredientComparison(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.flour._verify_amount('1')
+
+    def test_verify_measure(self):
+        self.assertEqual(self.flour._verify_measure('cup'), 'cup')
+        self.assertEqual(self.flour._verify_measure('cups'), 'cup')
+        self.assertEqual(self.flour._verify_measure('tablespoon'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('teaspoons'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('ml'), 'ml')
+        self.assertEqual(self.flour._verify_measure('l'), 'ml')
+        self.assertEqual(self.flour._verify_measure('mls'), 'ml')
+        self.assertEqual(self.flour._verify_measure('ls'), 'ml')
+        self.assertEqual(self.flour._verify_measure('g'), 'g')
+        self.assertEqual(self.flour._verify_measure('gs'), 'g')
+        self.assertEqual(self.flour._verify_measure('kg'), 'g')
+        self.assertEqual(self.flour._verify_measure('kgs'), 'g')
+
+        with self.assertRaises(TypeError):
+            self.flour._verify_measure(1)
+            self.flour._verify_measure(['cup'])
+            self.flour._verify_measure(('cup'))
+
+        with self.assertRaises(ValueError):
+            self.flour._verify_measure('1')
+            self.flour._verify_measure('lbs')
+
 
     def test_clean_name(self):
         self.flour2 = Ingredient('flour2', 1, 'cup', 'solid')

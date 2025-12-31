@@ -27,10 +27,8 @@ class Ingredient:
 
         """
         self._name = self._clean_name(name)
-        # self._amount = self._verify_amount(amount)
-        self._amount = amount
-        # self._measure = self._verify_measure(measure)
-        self._measure = measure
+        self._amount = self._verify_amount(amount)
+        self._measure = self._verify_measure(measure)
         self._density = None
         # self._state = self._verify_state(ingState)
         self._state = ingState
@@ -71,6 +69,44 @@ class Ingredient:
             case _: # default value
                 raise ValueError(f"{amount} is not a recognized ingredient "
                                  "amount")
+
+    def _verify_measure(self, measure:str) -> str:
+        """
+        verifies that the measure if an acceptable attribute for self._measure
+
+        Parameters:
+            measure:
+                str that contains either 'cup' or 'tablespoon' or 'teaspoon' or
+                'ml' or 'l', or 'g', or 'kg'
+
+        Precondition:
+            measure must be the correct type and the correct value
+        Raises:
+            ValueError:
+                if measure is not a correct value
+            TypeError:
+                if measure is not a correct type
+        """
+        if not isinstance(measure, str):
+            raise TypeError("measure must be a string but is a "
+                            f"{type(measure)}")
+        POSSIBLE_VALUES = ('cup', 'tablespoon', 'teaspoon', 'ml', 'l', 'g',
+                           'kg')
+        if measure.lower() not in POSSIBLE_VALUES:
+            # trim final character in case it is plural
+            measure = measure[0:-1].lower()
+            if measure not in POSSIBLE_VALUES:
+                raise ValueError("measure must be either 'cup', 'tablespoon', "
+                                 "'teaspoon', 'ml', 'l', 'g', or 'kg'")
+
+        if measure == 'l': # convert to ml
+            self._amount *= 1000
+            return 'ml'
+        elif measure == 'kg': # convert to g
+            self._amount *= 1000
+            return 'g'
+
+        return measure.lower()
 
     def name(self) -> str:
         return self._name
