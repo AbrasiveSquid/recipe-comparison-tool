@@ -7,7 +7,7 @@ class TestIngredientComparison(unittest.TestCase):
     def setUp(self):
         self.flour = Ingredient('flour', 1, 'cup')
         self.extraDarkBrownSugar = Ingredient('extra Dark-Brown sugar', 1, 'cup')
-        # self.vegOil = Ingredient('vegetable oil', '½', 'cup')
+        self.vegOil = Ingredient('vegetable oil', '½', 'cup')
         self.butter = Ingredient('butter', 2, 'tablespoon')
 
     def test_ingredient_init(self):
@@ -76,6 +76,22 @@ class TestIngredientComparison(unittest.TestCase):
             self.flour._verify_measure('1')
             self.flour._verify_measure('lbs')
 
+    def test_verify_state(self):
+        self.assertEqual(self.flour._verify_state('solid'), 'solid')
+        self.assertEqual(self.flour._verify_state('SOLID'), 'solid')
+        self.assertEqual(self.flour._verify_state('liquid'), 'liquid')
+        self.assertEqual(self.flour._verify_state('LIQUID'), 'liquid')
+        self.assertEqual(self.flour._verify_state(None), None)
+
+        with self.assertRaises(TypeError):
+            self.flour._verify_state(['liquid'])
+            self.flour._verify_state(('liquid'))
+            self.flour._verify_state(10)
+
+        with self.assertRaises(ValueError):
+            self.flour._verify_state('liquids')
+            self.flour._verify_state('solids')
+            self.flour._verify_state('gas')
 
     def test_clean_name(self):
         self.flour2 = Ingredient('flour2', 1, 'cup', 'solid')
@@ -98,7 +114,7 @@ class TestIngredientComparison(unittest.TestCase):
         self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
 
         # liquid conversion
-        # self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
+        self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
 
     def test_to_kitchen_measurement(self):
         self.assertEqual(self.flour.to_kitchen_measurement(), '1 cup')

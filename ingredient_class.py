@@ -30,8 +30,7 @@ class Ingredient:
         self._amount = self._verify_amount(amount)
         self._measure = self._verify_measure(measure)
         self._density = None
-        # self._state = self._verify_state(ingState)
-        self._state = ingState
+        self._state = self._verify_state(ingState)
 
         self._set_density_and_state_for_ingredient()
 
@@ -107,6 +106,38 @@ class Ingredient:
             return 'g'
 
         return measure.lower()
+
+    def _verify_state(self, ingState: str) -> str | None:
+        """
+        verifies that the ingState is a possible attribute value for
+        self._state
+
+        Parameters:
+            ingState:
+                str or None:
+                    can only be 'solid' or 'liquid' or None
+
+        Precondition:
+            ingState must be the correct type
+            ingState must be the correct value
+
+        Raises:
+            TypeError:
+                if ingState not the correct type
+            ValueError:
+                if ingState not the correct value
+        """
+        if not (isinstance(ingState, str) or ingState is None):
+            raise TypeError("ingState must be a str or None but is a "
+                            f"{type(ingState)}")
+        if ingState is None:
+            return ingState
+
+        if ingState.lower() not in ('liquid', 'solid'):
+            raise ValueError("possible values of ingState is 'liquid' or "
+                             "'solid")
+
+        return ingState.lower()
 
     def name(self) -> str:
         return self._name
