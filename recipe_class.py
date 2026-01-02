@@ -34,8 +34,6 @@ class Recipe:
         for ingredient in ingredientList:
             parsed = parse_ingredient(ingredient)
 
-
-
             if parsed.amount:
                 item = parsed.amount[0]
 
@@ -49,6 +47,25 @@ class Recipe:
 
             else:
                 raise ValueError(f"No quantity found: {ingredient}")
+
+    def title(self) -> str:
+        """
+        getter returns self._title
+        """
+        return self._title
+
+    def source(self) -> str:
+        """
+        getter for source of the recipe, returns self._source
+        """
+        return self._source
+
+    def instructions(self) -> str:
+        """
+        getter, returns self._instructions
+        """
+        return self._instructions
+
 
 
 ingredients1 = ['1 cup (120g) fine cornmeal', '1 cup (125g) all-purpose flour (spooned & leveled)', '1 teaspoon baking powder', '1/2 teaspoon baking soda', '1/8 teaspoon salt', '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled', '1/3 cup (67g) packed light or dark brown sugar', '2 Tablespoons (30ml) honey', '1 large egg, at room temperature', '1 cup (240ml) buttermilk, at room temperature*']
