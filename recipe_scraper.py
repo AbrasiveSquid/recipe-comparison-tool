@@ -17,6 +17,7 @@ try:
         print(f"Title: {scraper.title()}")
         print(f"Total Time: {scraper.total_time()} mins")
         print(scraper.ingredients())
+        print(scraper.instructions())
         print("\n\n")
 
 except requests.exceptions.Timeout:
