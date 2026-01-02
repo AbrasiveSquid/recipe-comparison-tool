@@ -48,7 +48,7 @@ class Ingredient:
                 if amount is not a correct type
         """
         if type(amount) == int or type(amount) == float:
-            return round(amount, 2)
+            return round(amount, 5)
 
         if not isinstance(amount, str):
             raise TypeError("amount must be a float, int, or unicode character"
@@ -67,9 +67,9 @@ class Ingredient:
                 case '¾':
                     return 0.75
                 case '⅓':
-                    return round(1/3, 2)
+                    return round(1/3, 5)
                 case '⅔':
-                    return round(2/3, 2)
+                    return round(2/3, 5)
                 case _: # default value
                     raise ValueError(f"{amount} is not a recognized ingredient "
                                      "amount")
@@ -237,13 +237,59 @@ class Ingredient:
         """
         returns a string of the measurement with number of cups or tablespoons
         or teaspoons depending on the amount
-        # TODO figure out cutoff amount
         """
-        if self._measure == 'cup':
-            return f"{self._amount} {self._measure}"
-        # TODO NEED TO FIGURE OUT TEASPOON AND TABLESPOON return
-        elif self._measure == 'g' or self._measure == 'ml':
+        measure = self._measure
+
+        if measure == 'cup':
+            return f"{self._amount} {measure}"
+        elif measure == 'g' or measure == 'ml':
             amount, measure = self._convert_to_kitchen()
+            return f"{amount} {measure}"
+        else:
+            raise Exception(f"._measure: {self._measure} is not a possible "
+                            "value")
+
+    def _convert_to_kitchen(self) -> tuple:
+        """
+        converts ingredient amount of metric units to kithcen measurements
+        of cups or tablespoons or teaspoons.
+        Example 125 g of flour will convert to 1 cup
+
+        Returns:
+            tuple of strings in order of (amount, measure)
+
+        Precondition:
+            self._measure but be either `g` or `ml`
+
+        Raises:
+            ValueError:
+                if self._measure not the correct value
+        """
+        METRIC_UNITS = ('g', 'ml')
+        if self._measure not in METRIC_UNITS:
+            raise ValueError("self._measure must be 'g' or 'ml'  but is "
+                             f"{self._measure}")
+        # constants
+        TABLESPOON_TO_CUP = 1/16
+        TEASPOON_TO_CUP = 1/48
+        QUARTER_CUP = 0.25
+
+        amount = self._amount / self._density
+
+        # format kitchen measurement
+        if amount >= QUARTER_CUP:
+            amount = self._format_amount(amount)
+            if amount != 1:
+                return amount, 'cups'
+            else:
+                return amount, 'cup'
+        elif round(amount,2) < QUARTER_CUP and round(amount,5) >= TABLESPOON_TO_CUP / 2:
+            # amount is between 1/2 tablespoon and 1/4 cup
+            amount = self._format_amount(amount * 1/TABLESPOON_TO_CUP)
+            return amount, 'Tbsp'
+        else:
+            amount = self._format_amount(amount * 1/TEASPOON_TO_CUP)
+            return amount, 'tsp'
 
     def to_metric(self) -> str:
         """
@@ -253,9 +299,12 @@ class Ingredient:
         measure = self._measure
         if measure == 'ml' or measure == 'g':
             return f"{self._amount} {measure}"
-        elif measure == 'cup' or measure == 'teaspoon':
+        elif measure in ('cup', 'teaspoon', 'tablespoon') :
             amount, measure = self._convert_to_metric()
             return f"{amount} {measure}"
+        else:
+            raise Exception(f"._measure: {self._measure} is not a possible "
+                            "value")
 
     def _convert_to_metric(self) -> tuple:
         """
@@ -287,10 +336,9 @@ class Ingredient:
             raise Exception(f"_measure: {self._measure} is not a possible"
                             " value.")
 
-        amount = round(self._amount * self._density * conversionFactor, 2)
+        amount = self._amount * self._density * conversionFactor
 
-        if int(amount) == amount:
-            amount = int(amount)
+        amount = self._format_amount(amount)
 
         if self._state == 'solid':
             return amount, 'g'
@@ -300,3 +348,23 @@ class Ingredient:
             raise ValueError("self._state must be either 'solid' or liquid' "
                              f"but is {self._state}")
 
+
+    def _format_amount(self, value:int | float) -> int | float:
+        """
+        checks if a float can be converted into an int and returns as an int
+        otherwise, returns the float
+
+        Precondition:
+            value must be the correct type
+
+        Raises:
+            TypeError:
+                if value not the correct type
+        """
+        if not (isinstance(value, int) or isinstance(value, float)):
+            raise TypeError("value must be an int or float but is "
+                            f"{type(value)}")
+
+        if int(value) == round(value, 5):
+            return int(value)
+        return round(value, 4)
