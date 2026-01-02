@@ -1,4 +1,6 @@
 import json
+import fractions
+
 class Ingredient:
     """
     represents an ingredient in a recipe
@@ -28,11 +30,16 @@ class Ingredient:
         """
         self._name = self._clean_name(name)
         self._amount = self._verify_amount(amount)
-        self._measure = self._verify_measure(measure)
+        self._measure = None
         self._density = None
-        self._state = self._verify_state(ingState)
+        self._state = None
 
-        self._set_density_and_state_for_ingredient()
+        if measure:
+            self._measure = self._verify_measure(measure)
+            self._state = self._verify_state(ingState)
+            self._set_density_and_state_for_ingredient()
+        else: # dimensionless ingredient, eg. 1 large egg
+            self._state = 'thing'
 
     def _verify_amount(self, amount: str | int | float) -> int | float:
         """
@@ -47,8 +54,9 @@ class Ingredient:
             TypeError:
                 if amount is not a correct type
         """
-        if type(amount) == int or type(amount) == float:
-            return round(amount, 5)
+        if (type(amount) == int or type(amount) == float or
+                type(amount) == fractions.Fraction):
+            return self._format_amount(float(amount))
 
         if not isinstance(amount, str):
             raise TypeError("amount must be a float, int, or unicode character"
@@ -105,7 +113,8 @@ class Ingredient:
             measure = measure[0:-1]
             if measure not in POSSIBLE_VALUES:
                 raise ValueError("measure must be either 'cup', 'tablespoon', "
-                                 "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg'")
+                                 "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg' but"
+                                 f"is {measure}")
 
         if measure == 'l': # convert to ml
             self._amount *= 1000
@@ -238,8 +247,10 @@ class Ingredient:
         returns a string of the measurement with number of cups or tablespoons
         or teaspoons depending on the amount
         """
-        measure = self._measure
+        if self._state == 'thing':
+            return ''
 
+        measure = self._measure
         if measure == 'cup':
             return f"{self._amount} {measure}"
         elif measure == 'g' or measure == 'ml':
@@ -296,6 +307,8 @@ class Ingredient:
         returns a string of the measurement in g (grams) if self._state is
         'solid' or mL if self._state is 'liquid'
         """
+        if self._state == 'thing':
+            return ''
         measure = self._measure
         if measure == 'ml' or measure == 'g':
             return f"{self._amount} {measure}"
