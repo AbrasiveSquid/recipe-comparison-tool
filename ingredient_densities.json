@@ -20,7 +20,7 @@
   "canola oil": { "density": 218, "state": "liquid" },
   "ghee": { "density": 210, "state": "solid" },
   "duck fat": { "density": 200, "state": "solid" },
-  "all-purpose flour": { "density": 120, "state": "solid" },
+  "all-purpose flour": { "density": 125, "state": "solid" },
   "flour": { "density": 125, "state": "solid" },
   "bread flour": { "density": 136, "state": "solid" },
   "cake flour": { "density": 115, "state": "solid" },

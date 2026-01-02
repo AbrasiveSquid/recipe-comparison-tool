@@ -9,6 +9,9 @@ class TestIngredientComparison(unittest.TestCase):
         self.extraDarkBrownSugar = Ingredient('extra Dark-Brown sugar', 1, 'cup')
         self.vegOil = Ingredient('vegetable oil', '½', 'cup')
         self.butter = Ingredient('butter', 2, 'tablespoon')
+        self.tableSpoonFlour = Ingredient('flour', 4, 'tablespoons')
+        self.teaspoonFlour = Ingredient('flour', 2, 'teaspoons')
+
 
     def test_ingredient_init(self):
         # flour test
@@ -44,12 +47,13 @@ class TestIngredientComparison(unittest.TestCase):
         self.assertEqual(self.flour._verify_amount('⅓'), 0.33)
         self.assertEqual(self.flour._verify_amount('⅔'), 0.67)
 
+        # numeric strings
+        self.assertEqual(self.flour._verify_amount('10'), 10)
+        self.assertEqual(self.flour._verify_amount('10.5'), 10.5)
+
         # incorrect types or values raise error
         with self.assertRaises(TypeError):
             self.flour._verify_amount([10])
-
-        with self.assertRaises(ValueError):
-            self.flour._verify_amount('1')
 
     def test_verify_measure(self):
         self.assertEqual(self.flour._verify_measure('cup'), 'cup')
@@ -124,8 +128,8 @@ class TestIngredientComparison(unittest.TestCase):
         # solid conversion
         self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
         # solid conversion teaspoon
-
-
+        self.assertEqual(self.teaspoonFlour._convert_to_metric(), (5.21, 'g'))
+        self.assertEqual(self.tableSpoonFlour._convert_to_metric(), (31.25, 'g'))
 
         # liquid conversion
         self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
@@ -133,5 +137,6 @@ class TestIngredientComparison(unittest.TestCase):
     def test_to_metric(self):
         self.assertEqual(self.flour.to_metric(), '125 g')
         self.assertEqual(self.vegOil.to_metric(), '109 ml')
+
     def test_to_kitchen_measurement(self):
         self.assertEqual(self.flour.to_kitchen_measurement(), '1 cup')

@@ -52,22 +52,27 @@ class Ingredient:
 
         if not isinstance(amount, str):
             raise TypeError("amount must be a float, int, or unicode character"
-                            f" of a fractin but is a {type(amount)}")
-
-        match amount:
-            case '¼':
-                return 0.25
-            case '½':
-                return 0.5
-            case '¾':
-                return 0.75
-            case '⅓':
-                return round(1/3, 2)
-            case '⅔':
-                return round(2/3, 2)
-            case _: # default value
-                raise ValueError(f"{amount} is not a recognized ingredient "
-                                 "amount")
+                            f" of a fraction but is a {type(amount)}")
+        if amount.isdecimal():
+            return int(amount)
+        try:
+            amount = float(amount)
+            return amount
+        except ValueError:
+            match amount:
+                case '¼':
+                    return 0.25
+                case '½':
+                    return 0.5
+                case '¾':
+                    return 0.75
+                case '⅓':
+                    return round(1/3, 2)
+                case '⅔':
+                    return round(2/3, 2)
+                case _: # default value
+                    raise ValueError(f"{amount} is not a recognized ingredient "
+                                     "amount")
 
     def _verify_measure(self, measure:str) -> str:
         """
@@ -272,7 +277,18 @@ class Ingredient:
             raise ValueError("self._measure must be 'cup' or 'tablespoon' or"
                              f"'teaspoon', but is {self._measure}")
 
-        amount = self._amount * self._density
+        if self._measure == 'cup':
+            conversionFactor = 1
+        elif self._measure == 'teaspoon':
+            conversionFactor = 1/48
+        elif self._measure == 'tablespoon':
+            conversionFactor = 1/16
+        else:
+            raise Exception(f"_measure: {self._measure} is not a possible"
+                            " value.")
+
+        amount = round(self._amount * self._density * conversionFactor, 2)
+
         if int(amount) == amount:
             amount = int(amount)
 
@@ -283,6 +299,4 @@ class Ingredient:
         else:
             raise ValueError("self._state must be either 'solid' or liquid' "
                              f"but is {self._state}")
-
-
 
