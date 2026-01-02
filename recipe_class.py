@@ -66,6 +66,33 @@ class Recipe:
         """
         return self._instructions
 
+    def ingredient_str(self) -> str:
+        """
+        returns a print friendly string representation of the ingredients
+        """
+        resultStr = ''
+
+        if self._ingredients:
+            resultStr += "\n**Ingredients**\n"
+            for ingredient in self._ingredients:
+                resultStr += f"\t{ingredient}\n"
+        if self._optionalIngredients:
+            resultStr += "\n**Optional Ingredients**\n"
+            for ingredient in self._optionalIngredients:
+                resultStr += f"\t{ingredient}\n"
+
+        return resultStr
+
+    def __str__(self) -> str:
+        """
+        returns a print friendly representation of the recipe
+        """
+        resultStr = f"Recipe: {self._title} from {self._source}\n"
+        resultStr += self.ingredient_str()
+        resultStr += f"\n**Instructions**\n{self._instructions}\n"
+
+        return resultStr
+
 
 
 ingredients1 = ['1 cup (120g) fine cornmeal', '1 cup (125g) all-purpose flour (spooned & leveled)', '1 teaspoon baking powder', '1/2 teaspoon baking soda', '1/8 teaspoon salt', '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled', '1/3 cup (67g) packed light or dark brown sugar', '2 Tablespoons (30ml) honey', '1 large egg, at room temperature', '1 cup (240ml) buttermilk, at room temperature*']

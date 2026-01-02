@@ -29,7 +29,7 @@ class Ingredient:
 
         """
         self._name = self._clean_name(name)
-        self._amount = self._verify_amount(amount)
+        self._amount = self._verify_amount(amount) # TODO change amount to Fraction objects
         self._measure = None
         self._density = None
         self._state = None
@@ -38,6 +38,7 @@ class Ingredient:
             self._measure = self._verify_measure(measure)
             self._state = self._verify_state(ingState)
             self._set_density_and_state_for_ingredient()
+
         else: # dimensionless ingredient, eg. 1 large egg
             self._state = 'thing'
 
@@ -381,3 +382,15 @@ class Ingredient:
         if int(value) == round(value, 5):
             return int(value)
         return round(value, 4)
+
+    def __str__(self) -> str:
+        """
+        returns print friendly str representation of an ingredient
+        """
+        if self._state == 'thing': # dimensionless
+            if self._amount == 0:
+                return f"{self._name}"
+            else:
+                return f"{self._amount} {self._name}"
+        else:
+            return f"{self._amount} {self._measure} {self._name}"
