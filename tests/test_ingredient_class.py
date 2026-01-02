@@ -56,8 +56,19 @@ class TestIngredientComparison(unittest.TestCase):
         self.assertEqual(self.flour._verify_measure('cups'), 'cup')
         self.assertEqual(self.flour._verify_measure('tablespoon'), 'tablespoon')
         self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
+        # tbsp., Tbsp., Tb., or T. are all shorthand for tablespoon
+        self.assertEqual(self.flour._verify_measure('tbsp'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('Tb'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('T'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('T.'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
+
         self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
         self.assertEqual(self.flour._verify_measure('teaspoons'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('tsp'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('t'), 'teaspoon')
+
+
         self.assertEqual(self.flour._verify_measure('ml'), 'ml')
         self.assertEqual(self.flour._verify_measure('l'), 'ml')
         self.assertEqual(self.flour._verify_measure('mls'), 'ml')
@@ -112,7 +123,10 @@ class TestIngredientComparison(unittest.TestCase):
     def test_convert_to_metric(self):
         # solid conversion
         self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
-        # TODO Test for teaspoons/tablespoon amounts
+        # solid conversion teaspoon
+
+
+
         # liquid conversion
         self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
 

@@ -89,14 +89,18 @@ class Ingredient:
         if not isinstance(measure, str):
             raise TypeError("measure must be a string but is a "
                             f"{type(measure)}")
-        POSSIBLE_VALUES = ('cup', 'tablespoon', 'teaspoon', 'ml', 'l', 'g',
-                           'kg')
-        if measure.lower() not in POSSIBLE_VALUES:
-            # trim final character in case it is plural
-            measure = measure[0:-1].lower()
+        if measure == 'T' or measure == 'T.':
+            return 'tablespoon'
+        measure = measure.lower()
+
+        POSSIBLE_VALUES = ('cup', 'tablespoon', 'tbsp', 'tb', 't', 'teaspoon',
+                           'tsp','ml', 'l', 'g', 'kg')
+        if measure not in POSSIBLE_VALUES:
+            # trim final character in case it is plural or '.'
+            measure = measure[0:-1]
             if measure not in POSSIBLE_VALUES:
                 raise ValueError("measure must be either 'cup', 'tablespoon', "
-                                 "'teaspoon', 'ml', 'l', 'g', or 'kg'")
+                                 "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg'")
 
         if measure == 'l': # convert to ml
             self._amount *= 1000
@@ -104,8 +108,12 @@ class Ingredient:
         elif measure == 'kg': # convert to g
             self._amount *= 1000
             return 'g'
+        elif measure in ('tablespoon', 'tbsp', 'tb'):
+            return 'tablespoon'
+        elif measure in ('teaspoon', 'tsp', 't'):
+            return 'teaspoon'
 
-        return measure.lower()
+        return measure
 
     def _verify_state(self, ingState: str) -> str | None:
         """
