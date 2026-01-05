@@ -42,7 +42,7 @@ class Ingredient:
         else: # dimensionless ingredient, eg. 1 large egg
             self._state = 'thing'
 
-    def _verify_amount(self, amount: str | int | float) -> int | float:
+    def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:
         """
         verifies that the amount if an acceptable attribute for self._amount
         If amount is a unicode fraction character it will be converted to float
@@ -57,28 +57,29 @@ class Ingredient:
         """
         if (type(amount) == int or type(amount) == float or
                 type(amount) == fractions.Fraction):
-            return self._format_amount(float(amount))
+            return self._convert_to_fraction(float(amount))
 
         if not isinstance(amount, str):
             raise TypeError("amount must be a float, int, or unicode character"
                             f" of a fraction but is a {type(amount)}")
-        if amount.isdecimal():
-            return int(amount)
         try:
-            amount = float(amount)
-            return amount
+            return self._convert_to_fraction((float(amount)))
         except ValueError:
             match amount:
                 case '¼':
-                    return 0.25
+                    return fractions.Fraction(1, 4)
                 case '½':
-                    return 0.5
+                    return fractions.Fraction(1,2)
                 case '¾':
-                    return 0.75
+                    return fractions.Fraction(3,4)
                 case '⅓':
-                    return round(1/3, 5)
+                    return fractions.Fraction(1,3)
                 case '⅔':
-                    return round(2/3, 5)
+                    return fractions.Fraction(2,3)
+                case '⅛':
+                    return fractions.Fraction(1,8)
+                case '⅜':
+                    return fractions.Fraction(3,8)
                 case _: # default value
                     raise ValueError(f"{amount} is not a recognized ingredient "
                                      "amount")
@@ -171,14 +172,14 @@ class Ingredient:
         self._name = self._clean_name(newName)
         self._set_density_and_state_for_ingredient()
 
-    def amount(self) -> int | float:
+    def amount(self) -> fractions.Fraction:
         return self._amount
 
     def set_amount(self, newAmount:int|float) -> None:
         if not (type(newAmount) == int or type(newAmount) == float):
             raise TypeError("newAmount must be an int or float but is a "
                             f"{type(newAmount)}")
-        self._amount = newAmount
+        self._amount = self._convert_to_fraction(newAmount)
 
     def measure(self) -> str:
         return self._measure
@@ -282,11 +283,11 @@ class Ingredient:
             raise ValueError("self._measure must be 'g' or 'ml'  but is "
                              f"{self._measure}")
         # constants
-        TABLESPOON_TO_CUP = 1/16
-        TEASPOON_TO_CUP = 1/48
-        QUARTER_CUP = 0.25
+        TABLESPOON_TO_CUP = fractions.Fraction(1,16)
+        TEASPOON_TO_CUP = fractions.Fraction(1,48)
+        QUARTER_CUP = fractions.Fraction(1,4)
 
-        amount = self._amount / self._density
+        amount = fractions.Fraction(self._amount / self._density)
 
         # format kitchen measurement
         if amount >= QUARTER_CUP:
@@ -295,7 +296,7 @@ class Ingredient:
                 return amount, 'cups'
             else:
                 return amount, 'cup'
-        elif round(amount,2) < QUARTER_CUP and round(amount,5) >= TABLESPOON_TO_CUP / 2:
+        elif amount < QUARTER_CUP and amount >= TABLESPOON_TO_CUP / 2:
             # amount is between 1/2 tablespoon and 1/4 cup
             amount = self._format_amount(amount * 1/TABLESPOON_TO_CUP)
             return amount, 'Tbsp'
@@ -363,10 +364,9 @@ class Ingredient:
                              f"but is {self._state}")
 
 
-    def _format_amount(self, value:int | float) -> int | float:
+    def _convert_to_fraction(self, value:int | float) -> fractions.Fraction:
         """
-        checks if a float can be converted into an int and returns as an int
-        otherwise, returns the float
+        converts value into a fraction object
 
         Precondition:
             value must be the correct type
@@ -375,13 +375,37 @@ class Ingredient:
             TypeError:
                 if value not the correct type
         """
+        if isinstance(value, fractions.Fraction):
+            return value
         if not (isinstance(value, int) or isinstance(value, float)):
-            raise TypeError("value must be an int or float but is "
+            raise TypeError("value must be an int, float or Fraction but is "
                             f"{type(value)}")
 
-        if int(value) == round(value, 5):
+        return fractions.Fraction(value)
+
+    def _format_amount(self, value: int | float | fractions.Fraction)  -> int | float:
+        """
+        formats an int, float, or fraction object into a human readable int or
+        float
+
+        Precondition:
+            value must be the correct type
+
+        Raises:
+            TypeError:
+                if value not the correct type
+        """
+        if not (isinstance(value, int)
+                or isinstance(value, float)
+                or isinstance(value, fractions.Fraction)):
+            raise TypeError("value must be an int, float or Fraction but is "
+                            f"{type(value)}")
+        value = round(float(value), 4)
+        if value == int(value): # checks if value is can be an int
             return int(value)
-        return round(value, 4)
+
+        return value
+
 
     def __str__(self) -> str:
         """

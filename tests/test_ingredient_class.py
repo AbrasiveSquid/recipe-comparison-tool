@@ -1,5 +1,5 @@
 import unittest
-
+import fractions
 from ingredient_class import Ingredient
 
 
@@ -35,40 +35,42 @@ class TestIngredient(unittest.TestCase):
     def test_ingredient_init(self):
         # flour test
         self.assertEqual(self.flour.name(), 'flour')
-        self.assertEqual(self.flour.amount(), 1)
+        self.assertEqual(int(self.flour.amount()), fractions.Fraction(1,1))
+
+        self.assertEqual(int(self.flour.amount()), 1)
         self.assertEqual(self.flour.measure(), 'cup' )
         self.assertEqual(self.flour._density, 125)
 
         # test not perfect match with extra dark brown sugar
         self.assertEqual(self.extraDarkBrownSugar.name(), 'extra dark brown sugar')
-        self.assertEqual(self.extraDarkBrownSugar.amount(), 1)
+        self.assertEqual(self.extraDarkBrownSugar.amount(), fractions.Fraction(1,1))
         self.assertEqual(self.extraDarkBrownSugar.measure(), 'cup')
         self.assertEqual(self.extraDarkBrownSugar._density, 230)
 
         # test kilogram to gram conversion
         kiloFlour = Ingredient('flour', 1, 'kg')
-        self.assertEqual(kiloFlour.amount(), 1000)
+        self.assertEqual(kiloFlour.amount(), fractions.Fraction(1000))
         self.assertEqual(kiloFlour.measure(), 'g')
 
         # test litre to ml conversion
         litreWater = Ingredient('water', 2.5, 'l')
-        self.assertEqual(litreWater.amount(), 2500)
+        self.assertEqual(litreWater.amount(), fractions.Fraction(2500))
         self.assertEqual(litreWater.measure(), 'ml')
 
     def test_verify_amount(self):
-        self.assertEqual(self.flour._verify_amount(10), 10)
-        self.assertEqual(self.flour._verify_amount(10.5), 10.5)
-        self.assertEqual(self.flour._verify_amount(0.32223), 0.32223)
-        self.assertEqual(self.flour._verify_amount(0.545), 0.545)
-        self.assertEqual(self.flour._verify_amount('¼'), 0.25)
-        self.assertEqual(self.flour._verify_amount('¾'), 0.75)
-        self.assertEqual(self.flour._verify_amount('½'), 0.5)
-        self.assertEqual(self.flour._verify_amount('⅓'), 0.33333)
-        self.assertEqual(self.flour._verify_amount('⅔'), 0.66667)
+        self.assertEqual(self.flour._verify_amount(10), fractions.Fraction(10,1))
+        self.assertEqual(self.flour._verify_amount(10.5), fractions.Fraction(21,2))
+        self.assertEqual(self.flour._verify_amount(0.32223), fractions.Fraction(1451194907927595, 4503599627370496))
+        self.assertEqual(self.flour._verify_amount(0.545), fractions.Fraction(4908923593833841, 9007199254740992))
+        self.assertEqual(self.flour._verify_amount('¼'), fractions.Fraction(1,4))
+        self.assertEqual(self.flour._verify_amount('¾'), fractions.Fraction(3,4))
+        self.assertEqual(self.flour._verify_amount('½'), fractions.Fraction(1,2))
+        self.assertEqual(self.flour._verify_amount('⅓'), fractions.Fraction(1,3))
+        self.assertEqual(self.flour._verify_amount('⅔'), fractions.Fraction(2,3))
 
         # numeric strings
-        self.assertEqual(self.flour._verify_amount('10'), 10)
-        self.assertEqual(self.flour._verify_amount('10.5'), 10.5)
+        self.assertEqual(self.flour._verify_amount('10'), fractions.Fraction(10,1))
+        self.assertEqual(self.flour._verify_amount('10.5'), fractions.Fraction(21,2))
 
         # incorrect types or values raise error
         with self.assertRaises(TypeError):
@@ -148,7 +150,7 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
         # solid conversion teaspoon
         self.assertEqual(self.teaspoonFlour._convert_to_metric(), (5.2083, 'g'))
-        self.assertEqual(self.tableSpoonFlour._convert_to_metric(), (31.25, 'g'))
+        self.assertEqual(self.tableSpoonFlour._convert_to_metric(), (31.2500, 'g'))
 
         # liquid conversion
         self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
