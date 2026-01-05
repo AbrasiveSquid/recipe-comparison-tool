@@ -3,7 +3,7 @@ import unittest
 from ingredient_class import Ingredient
 
 
-class TestIngredientComparison(unittest.TestCase):
+class TestIngredient(unittest.TestCase):
     def setUp(self):
         self.flour = Ingredient('flour', 1, 'cup')
         self.extraDarkBrownSugar = Ingredient('extra Dark-Brown sugar', 1, 'cup')
