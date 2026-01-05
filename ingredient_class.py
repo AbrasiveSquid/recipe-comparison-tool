@@ -27,12 +27,35 @@ class Ingredient:
                 possible ingState is solid or liquid or None
                 used for determining possible conversion options
 
+        Attributes:
+                self._density:
+                    None or int
+                    value of density of the ingredient in ml/cup or g/cup
+
+                self._state:
+                    'solid' or 'liquid' or 'thing'
+                    determines if to use g/cup or ml/cup for conversion and
+                    effects output strings
+                    'thing' used for ingredient without a measurement and just
+                    an amount or if there are no measurements included in the
+                    parser (common with optional ingredients, such as 'salt to
+                    taste')
+
+                self._keywords:
+                    list that contains key words of the ingredient
+                    removes filler words such as 'all', 'extra', 'virgin',
+                    'fine', 'coarse', etc that are adjectives. Makes comparison
+                    of ingredients more efficient
+
+
+
         """
         self._name = self._clean_name(name)
-        self._amount = self._verify_amount(amount) # TODO change amount to Fraction objects
+        self._amount = self._verify_amount(amount)
         self._measure = None
         self._density = None
         self._state = None
+        self._keywords = []
 
         if measure:
             self._measure = self._verify_measure(measure)
@@ -41,6 +64,9 @@ class Ingredient:
 
         else: # dimensionless ingredient, eg. 1 large egg
             self._state = 'thing'
+
+        self._add_keywords()
+
 
     def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:
         """
@@ -262,6 +288,39 @@ class Ingredient:
             raise Exception(f"._measure: {self._measure} is not a possible "
                             "value")
 
+    def _add_keywords(self) -> None:
+        """
+        adds all keywords from self._name to self._keywords.
+        keywords are words that are not adjectives such as 'all', 'coarse',
+        'virgin', etc
+        """
+        # constant
+        FILLER_WORDS = ('all', 'purpose', 'extra', 'large', 'small', 'medium',
+                        'fine', 'coarse', 'thick', 'thin', 'melted',
+                        'softened', 'chilled', 'cold', 'room', 'temperature',
+                        'sifted', 'packed', 'leveled', 'spooned', 'grated',
+                        'minced', 'chopped', 'diced', 'sliced', 'crushed',
+                        'beaten', 'whisked', 'melted', 'organic', 'natural',
+                        'virgin', 'unsalted', 'salted', 'sweetened',
+                        'unsweetened', 'light', 'dark')
+
+        words = self._name.split(' ')
+        for word in words:
+            if word not in FILLER_WORDS:
+                self._keywords.append(word)
+
+        # hardcode white and brown sugar so aren't returned as the same
+        if self._keywords == ['white', 'sugar']:
+            self._keywords = ['white sugar']
+        elif self._keywords == ['brown', 'sugar']:
+            self._keywords = ['brown sugar']
+
+
+    def keywords(self) -> list:
+        """
+        returns a list of the ingredient's keywords
+        """
+        return self._keywords
     def _convert_to_kitchen(self) -> tuple:
         """
         converts ingredient amount of metric units to kithcen measurements
@@ -418,3 +477,24 @@ class Ingredient:
                 return f"{self._amount} {self._name}"
         else:
             return f"{self._amount} {self._measure} {self._name}"
+
+    def compare_ingredient(self, other) -> bool:
+        """
+        checks if other is a same or similar ingredient as self and returns
+        a boolean
+
+        Precondition:
+            other must be the correct type
+
+        Raises:
+            TypeError:
+                if other not the correct type
+        """
+        if not isinstance(other, Ingredient):
+            raise TypeError("other must be an Ingredient but is a "
+                            f"{type(other)}")
+
+        for keyword in self._keywords:
+            if keyword in other._keywords:
+                return True
+        return False

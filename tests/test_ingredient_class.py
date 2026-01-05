@@ -7,6 +7,11 @@ class TestIngredient(unittest.TestCase):
     def setUp(self):
         self.flour = Ingredient('flour', 1, 'cup')
         self.extraDarkBrownSugar = Ingredient('extra Dark-Brown sugar', 1, 'cup')
+        self.whiteSugar = Ingredient('white sugar', 1, 'cup')
+        self.icingSugar = Ingredient('icing sugar', 1, 'cup')
+
+        self.allPurposeFlour = Ingredient('all-purpose Flour', 1, 'cup')
+        self.extraVirginOliveOil = Ingredient('extra-virgin Olive Oil', 100, 'ml')
         self.vegOil = Ingredient('vegetable oil', '½', 'cup')
         self.butter = Ingredient('butter', 2, 'tablespoon')
         self.tableSpoonFlour = Ingredient('flour', 4, 'tablespoons')
@@ -56,6 +61,15 @@ class TestIngredient(unittest.TestCase):
         litreWater = Ingredient('water', 2.5, 'l')
         self.assertEqual(litreWater.amount(), fractions.Fraction(2500))
         self.assertEqual(litreWater.measure(), 'ml')
+
+        # test keywords
+        self.assertEqual(self.extraDarkBrownSugar.keywords(), ['brown sugar'])
+        self.assertEqual(self.flour.keywords(), ['flour'])
+        self.assertEqual(self.extraVirginOliveOil.keywords(), ['olive', 'oil'])
+        self.assertEqual(self.whiteSugar.keywords(), ['white sugar'])
+        self.assertEqual(self.icingSugar.keywords(), ['icing', 'sugar'])
+        self.assertEqual(self.allPurposeFlour.keywords(), ['flour'])
+
 
     def test_verify_amount(self):
         self.assertEqual(self.flour._verify_amount(10), fractions.Fraction(10,1))
@@ -216,3 +230,17 @@ class TestIngredient(unittest.TestCase):
         # teaspoons
         self.assertEqual(self.teaspoonMetricVegOil.to_kitchen_measurement(),'1 tsp')
         self.assertEqual(self.halfTeaspoonMetricVegOil.to_kitchen_measurement(),'0.5 tsp')
+
+    def test_compare_ingredient(self):
+        brownSugar = Ingredient('Brown Sugar', 100, 'g')
+        self.assertTrue(brownSugar.compare_ingredient(self.extraDarkBrownSugar))
+        self.assertTrue(self.extraDarkBrownSugar.compare_ingredient(brownSugar))
+
+        # same ingredient
+        self.assertTrue(self.flour.compare_ingredient(self.flour))
+        self.assertTrue(self.metricCupFlour.compare_ingredient(self.flour))
+
+        # similar ingredients
+        self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
+
+

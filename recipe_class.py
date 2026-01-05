@@ -93,4 +93,31 @@ class Recipe:
 
         return resultStr
 
-    
+    def is_empty(self) -> bool:
+        return len(self._ingredients) == 0
+
+    def compare_recipe(self, other:Recipe) -> str:
+        """
+        compares this recipe with another recipe by finding all same or similar
+        ingredients and returning a string with the ingredients for each recipe
+
+        Precondition:
+            other must be the correct type
+
+        Raises:
+            TypeError:
+                if other is not the correct type
+            Exception:
+                if other has no ingredients
+                if self has no ingredients
+        """
+        if not isinstance(other, Recipe):
+            raise TypeError("other must be a Recipe object but is a "
+                            f"{type(other)}")
+        if self.is_empty() or other.is_empty():
+            raise Exception("self and other must contain a list of "
+                            "ingredients")
+
+        # should I instead use a dictionary
+
+
