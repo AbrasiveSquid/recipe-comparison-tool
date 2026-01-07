@@ -118,6 +118,49 @@ class Recipe:
             raise Exception("self and other must contain a list of "
                             "ingredients")
 
-        # should I instead use a dictionary
+        ingredientPairs = []
 
+        thisRecipe = self._ingredients
+        thisRecipe.reverse() # reverse more efficient to pop from end in loop
+        otherRecipe = other._ingredients
+
+
+        while len(thisRecipe) and len(otherRecipe):
+            thisIngredient = thisRecipe.pop()
+
+            for i in range(len(otherRecipe)):
+                if thisIngredient.compare_ingredient(otherRecipe[i]):
+                    ingredientPairs.append((thisIngredient,
+                                            otherRecipe.pop(i)))
+                    break
+            else:
+                # if no similar ingredient found, add with None, output will
+                # show no comparable ingredient
+                ingredientPairs.append((thisIngredient, None))
+
+        # if either recipe has remaining ingredients add to list
+        while len(thisRecipe):
+            for ingredient in thisRecipe:
+                ingredientPairs.append((ingredient, None))
+
+        while len(otherRecipe):
+            for ingredient in otherRecipe:
+                ingredientPairs.append((None, ingredient))
+
+        # format output
+        resultStr = ''
+
+        for pair in ingredientPairs:
+            if pair[0] is None:
+                resultStr += f"\t\t\t{str(pair[1])}"
+            elif pair[1] is None:
+                resultStr += f"{str(pair[0])}"
+            else:
+                # need ingredient method that just normalizes both ingredients
+                #  to same measurement than returns the difference +/-
+                resultStr += (f"{str(pair[0])}\t\t\t{str(pair[1])}\t\t"
+                               f"{pair[0].difference(pair[1])}")
+                                # TODO write difference method
+
+        return resultStr
 

@@ -498,3 +498,23 @@ class Ingredient:
             if keyword in other._keywords:
                 return True
         return False
+
+    def differene(self, other: Ingredient) -> str:
+        """
+        normalizes other to self and returns the difference + or - that other
+        is compared to self
+
+        Precondition:
+            other must be an Ingredient
+            other must be a similar Ingredient (compare_ingredient returns True)
+            other must the same ._state
+
+        Raises:
+            TypeError:
+                if other is not the correct type
+            ValueError:
+                if other is not a comparable ingredient
+                if other is not the correct ._state
+        """
+        pass
+        # TODO need to write
