@@ -54,13 +54,13 @@ class Ingredient:
         self._name = self._clean_name(name)
         self._kitchenAmount = None
         self._kitchenMeasure = None
-        self._metric_amount = None
+        self._metricAmount = None
+        self._metricMeasure = None
         self._density = None
         self._state = None
         self._keywords = []
 
         if measure:
-            self._measure = self._verify_measure(measure)
             self._state = self._verify_state(ingState)
             self._set_density_and_state_for_ingredient()
         else:  # dimensionless ingredient, eg. 1 large egg
@@ -78,9 +78,38 @@ class Ingredient:
         sets the attributes for ._kitchenAmount, ._kitchenMeasure,
         ._metricAmount
         """
-        # TODO Working here
+        # constants
+        KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
+        METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
 
-    def _verify_amount(self, amount: str | int | float) -> None:
+        measure = self._verify_measure(measure)
+
+        if measure in KITCHEN_MEASURES:
+            self._kitchenMeasure = measure
+            self._kitchenAmount = self._verify_amount(amount)
+            # _convert_to_metric returns tuple as (amount, measure)
+            metricAmount, metricMeasure = self._convert_to_metric()
+            self._metricAmount = self._convert_to_fraction(metricAmount)
+            self._metricMeasure = metricMeasure
+
+        elif measure in METRIC_MEASURES:
+            if measure in ('ml', 'g'):
+                self._metricAmount = self._verify_amount(amount)
+                self._metricMeasure = measure
+            elif measure in ('l', 'kg'):
+                if measure == 'l':
+                    measure = 'ml'
+                else:
+                    measure = 'g'
+                self._metricAmount = self._verify_amount(amount) * 1000
+                self._metricMeasure = measure
+
+            kitchenAmount, kitchenMeasure = self._convert_to_kitchen()
+            self._kitchenAmount = self._convert_to_fraction(kitchenAmount)
+            self._kitchenMeasure = kitchenMeasure
+
+
+    def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:
         """
         sets the attributes for ._kitchen_amount and ._metric_amount that the
         amount if an acceptable attribute for self._amount.
@@ -88,7 +117,7 @@ class Ingredient:
         Fraction
 
         Precondition:
-            amount must be an int, float, Fraciton, or unicode fraction str
+            amount must be an int, float, Fraction, or unicode fraction str
             character
         Raises:
             ValueError:
@@ -96,15 +125,16 @@ class Ingredient:
             TypeError:
                 if amount is not a correct type
         """
-        if (type(amount) == int or type(amount) == float or
-                type(amount) == fractions.Fraction):
-            return self._convert_to_fraction(float(amount))
+        if isinstance(amount, fractions.Fraction):
+            return amount
+        if type(amount) == int or type(amount) == float:
+            return self._convert_to_fraction(amount)
 
         if not isinstance(amount, str):
             raise TypeError("amount must be a float, int, or unicode character"
                             f" of a fraction but is a {type(amount)}")
         try:
-            return self._convert_to_fraction((float(amount)))
+            return self._convert_to_fraction((amount))
         except ValueError:
             match amount:
                 case '¼':
@@ -159,13 +189,8 @@ class Ingredient:
                                  "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg' but"
                                  f"is {measure}")
 
-        if measure == 'l': # convert to ml
-            self._amount *= 1000
-            return 'ml'
-        elif measure == 'kg': # convert to g
-            self._amount *= 1000
-            return 'g'
-        elif measure in ('tablespoon', 'tbsp', 'tb'):
+
+        if measure in ('tablespoon', 'tbsp', 'tb'):
             return 'tablespoon'
         elif measure in ('teaspoon', 'tsp', 't'):
             return 'teaspoon'
@@ -207,29 +232,17 @@ class Ingredient:
     def name(self) -> str:
         return self._name
 
-    def set_name(self, newName:str) -> None:
-        if not isinstance(newName, str):
-            raise TypeError(f"newName must be a str but is a {type(newName)}")
-        self._name = self._clean_name(newName)
-        self._set_density_and_state_for_ingredient()
+    def metric_amount(self) -> fractions.Fraction:
+        return self._metricAmount
 
-    def amount(self) -> fractions.Fraction:
-        return self._amount
+    def kitchen_amount(self) -> fractions.Fraction:
+        return self._kitchenAmount
 
-    def set_amount(self, newAmount:int|float) -> None:
-        if not (type(newAmount) == int or type(newAmount) == float):
-            raise TypeError("newAmount must be an int or float but is a "
-                            f"{type(newAmount)}")
-        self._amount = self._convert_to_fraction(newAmount)
+    def metric_measure(self) -> str:
+        return self._metricMeasure
 
-    def measure(self) -> str:
-        return self._measure
-
-    def set_measure(self, newMeasure:str) -> None:
-        if not isinstance(newMeasure, str):
-            raise TypeError("newMeasure must be a str but is a "
-                            f"{type(newMeasure)}")
-        self._measure = newMeasure
+    def kitchen_measure(self) -> str:
+        return self._kitchenMeasure
 
     def _load_densities(self, filename="ingredient_densities.json") -> dict:
         """
@@ -336,6 +349,7 @@ class Ingredient:
         returns a list of the ingredient's keywords
         """
         return self._keywords
+
     def _convert_to_kitchen(self) -> tuple:
         """
         converts ingredient amount of metric units to kithcen measurements
@@ -353,30 +367,31 @@ class Ingredient:
                 if self._measure not the correct value
         """
         METRIC_UNITS = ('g', 'ml')
-        if self._measure not in METRIC_UNITS:
-            raise ValueError("self._measure must be 'g' or 'ml'  but is "
-                             f"{self._measure}")
+        if self._metricMeasure not in METRIC_UNITS:
+            raise ValueError("self._metricMeasure must be 'g' or 'ml'  but is "
+                             f"{self._metricMeasure}")
         # constants
         TABLESPOON_TO_CUP = fractions.Fraction(1,16)
         TEASPOON_TO_CUP = fractions.Fraction(1,48)
         QUARTER_CUP = fractions.Fraction(1,4)
 
-        amount = fractions.Fraction(self._amount / self._density)
+        amount = fractions.Fraction(self._metricAmount / self._density)
 
         # format kitchen measurement
         if amount >= QUARTER_CUP:
-            amount = self._format_amount(amount)
-            if amount != 1:
-                return amount, 'cups'
-            else:
-                return amount, 'cup'
-        elif amount < QUARTER_CUP and amount >= TABLESPOON_TO_CUP / 2:
+            # formattedAmount = self._format_amount(amount) # will convert 1.0000 to 1 for example
+            # if formattedAmount != 1: # TODO come back and figure out how to handle this
+            #     return amount, 'cups'
+            # else:
+            return amount, 'cup'
+
+        elif QUARTER_CUP > amount >= TABLESPOON_TO_CUP / 2:
             # amount is between 1/2 tablespoon and 1/4 cup
-            amount = self._format_amount(amount * 1/TABLESPOON_TO_CUP)
-            return amount, 'Tbsp'
+            amount = amount * (1/TABLESPOON_TO_CUP)
+            return amount, 'tablespoon'
         else:
-            amount = self._format_amount(amount * 1/TEASPOON_TO_CUP)
-            return amount, 'tsp'
+            amount = amount * (1/TEASPOON_TO_CUP)
+            return amount, 'teaspoon'
 
     def to_metric(self) -> str:
         """
@@ -385,15 +400,15 @@ class Ingredient:
         """
         if self._state == 'thing':
             return ''
-        measure = self._measure
+        measure = self._kitchenMeasure
         if measure == 'ml' or measure == 'g':
-            return f"{self._amount} {measure}"
+            return f"{self._metricAmount} {measure}"
         elif measure in ('cup', 'teaspoon', 'tablespoon') :
             amount, measure = self._convert_to_metric()
             return f"{amount} {measure}"
         else:
-            raise Exception(f"._measure: {self._measure} is not a possible "
-                            "value")
+            raise Exception(f".self._kitchenMeasure: {measure} "
+                            "is not a possible value")
 
     def _convert_to_metric(self) -> tuple:
         """
@@ -411,23 +426,21 @@ class Ingredient:
                 if self._measure not the correct value
         """
         KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
-        if self._measure not in KITCHEN_MEASURES:
+        if self._kitchenMeasure not in KITCHEN_MEASURES:
             raise ValueError("self._measure must be 'cup' or 'tablespoon' or"
                              f"'teaspoon', but is {self._measure}")
 
-        if self._measure == 'cup':
+        if self._kitchenMeasure == 'cup':
             conversionFactor = 1
-        elif self._measure == 'teaspoon':
+        elif self._kitchenMeasure == 'teaspoon':
             conversionFactor = 1/48
-        elif self._measure == 'tablespoon':
+        elif self._kitchenMeasure == 'tablespoon':
             conversionFactor = 1/16
         else:
-            raise Exception(f"_measure: {self._measure} is not a possible"
-                            " value.")
+            raise Exception(f"self._kitchenMeasure: {self._kitchenMeasure} is "
+                            "not a possible value.")
 
-        amount = self._amount * self._density * conversionFactor
-
-        amount = self._format_amount(amount)
+        amount = self._kitchenAmount * self._density * conversionFactor
 
         if self._state == 'solid':
             return amount, 'g'
@@ -438,7 +451,7 @@ class Ingredient:
                              f"but is {self._state}")
 
 
-    def _convert_to_fraction(self, value:int | float) -> fractions.Fraction:
+    def _convert_to_fraction(self, value: str |int | float | fractions.Fraction) ->fractions.Fraction:
         """
         converts value into a fraction object
 
@@ -451,11 +464,17 @@ class Ingredient:
         """
         if isinstance(value, fractions.Fraction):
             return value
-        if not (isinstance(value, int) or isinstance(value, float)):
-            raise TypeError("value must be an int, float or Fraction but is "
-                            f"{type(value)}")
-
-        return fractions.Fraction(value)
+        if not (isinstance(value, str)
+                or isinstance(value, int)
+                or isinstance(value, float)):
+            raise TypeError(f"value must be a str that can be converted to an "
+                            f"int or float or an int or float")
+        try:
+            float(value)
+            return fractions.Fraction(str(value))
+        except ValueError:
+            raise ValueError(f"value: {(value)} be a str that represents a "
+                             f"int or float")
 
     def _format_amount(self, value: int | float | fractions.Fraction)  -> int | float:
         """
@@ -514,7 +533,7 @@ class Ingredient:
                 return True
         return False
 
-    def difference(self, other: Ingredient) -> str:
+    def difference(self, other) -> str:
         """
         normalizes other to self and returns the difference + or - that other
         is compared to self
@@ -531,13 +550,15 @@ class Ingredient:
                 if other is not a comparable ingredient
                 if other is not the correct ._state
         """
-        if not isinstance(other, Ingredient):
-            raise TypeError("other must be an Ingredient but is a "
-                            f"{type(other)}")
-        # constants
-        KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
-        METRIC_MEASURES = ('ml', 'g')
-
-        if (other.measure() in KITCHEN_MEASURES
-            and self.measure() in KITCHEN_MEASURES):
-            # TODO unifinished, maybe I should preprocess to have attribute as metric and kitchen measurement
+        # if not isinstance(other, Ingredient):
+        #     raise TypeError("other must be an Ingredient but is a "
+        #                     f"{type(other)}")
+        # # constants
+        # KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
+        # METRIC_MEASURES = ('ml', 'g')
+        #
+        #
+        # if (other.measure() in KITCHEN_MEASURES
+        #     and self.measure() in KITCHEN_MEASURES):
+        #
+        pass
