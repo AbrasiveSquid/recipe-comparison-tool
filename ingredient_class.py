@@ -50,9 +50,11 @@ class Ingredient:
 
 
         """
+        # TODO rewrite
         self._name = self._clean_name(name)
-        self._amount = self._verify_amount(amount)
-        self._measure = None
+        self._kitchenAmount = None
+        self._kitchenMeasure = None
+        self._metric_amount = None
         self._density = None
         self._state = None
         self._keywords = []
@@ -61,20 +63,33 @@ class Ingredient:
             self._measure = self._verify_measure(measure)
             self._state = self._verify_state(ingState)
             self._set_density_and_state_for_ingredient()
-
-        else: # dimensionless ingredient, eg. 1 large egg
+        else:  # dimensionless ingredient, eg. 1 large egg
             self._state = 'thing'
+
+        # TODO have this method call methods to set amounts and measures
+        self._set_amounts_and_measures(amount, measure)
 
         self._add_keywords()
 
-
-    def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:
+    def _set_amounts_and_measures(self,
+                                  amount: str|int|float|fractions.Fraction,
+                                  measure: str) -> None:
         """
-        verifies that the amount if an acceptable attribute for self._amount
-        If amount is a unicode fraction character it will be converted to float
+        sets the attributes for ._kitchenAmount, ._kitchenMeasure,
+        ._metricAmount
+        """
+        # TODO Working here
+
+    def _verify_amount(self, amount: str | int | float) -> None:
+        """
+        sets the attributes for ._kitchen_amount and ._metric_amount that the
+        amount if an acceptable attribute for self._amount.
+        If amount is a unicode fraction character it will be converted to a
+        Fraction
 
         Precondition:
-            amount must be an int, float, or unicode fraction str character
+            amount must be an int, float, Fraciton, or unicode fraction str
+            character
         Raises:
             ValueError:
                 if amount is not a correct value
@@ -499,7 +514,7 @@ class Ingredient:
                 return True
         return False
 
-    def differene(self, other: Ingredient) -> str:
+    def difference(self, other: Ingredient) -> str:
         """
         normalizes other to self and returns the difference + or - that other
         is compared to self
@@ -516,5 +531,13 @@ class Ingredient:
                 if other is not a comparable ingredient
                 if other is not the correct ._state
         """
-        pass
-        # TODO need to write
+        if not isinstance(other, Ingredient):
+            raise TypeError("other must be an Ingredient but is a "
+                            f"{type(other)}")
+        # constants
+        KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
+        METRIC_MEASURES = ('ml', 'g')
+
+        if (other.measure() in KITCHEN_MEASURES
+            and self.measure() in KITCHEN_MEASURES):
+            # TODO unifinished, maybe I should preprocess to have attribute as metric and kitchen measurement
