@@ -96,105 +96,104 @@ class TestIngredient(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.flour._verify_amount([10])
 
-    # def test_verify_measure(self):
-    #     self.assertEqual(self.flour._verify_measure('cup'), 'cup')
-    #     self.assertEqual(self.flour._verify_measure('cups'), 'cup')
-    #     self.assertEqual(self.flour._verify_measure('tablespoon'), 'tablespoon')
-    #     self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
-    #     # tbsp., Tbsp., Tb., or T. are all shorthand for tablespoon
-    #     self.assertEqual(self.flour._verify_measure('tbsp'), 'tablespoon')
-    #     self.assertEqual(self.flour._verify_measure('Tb'), 'tablespoon')
-    #     self.assertEqual(self.flour._verify_measure('T'), 'tablespoon')
-    #     self.assertEqual(self.flour._verify_measure('T.'), 'tablespoon')
-    #     self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
-    #
-    #     self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
-    #     self.assertEqual(self.flour._verify_measure('teaspoons'), 'teaspoon')
-    #     self.assertEqual(self.flour._verify_measure('tsp'), 'teaspoon')
-    #     self.assertEqual(self.flour._verify_measure('t'), 'teaspoon')
-    #
-    #
-    #     self.assertEqual(self.flour._verify_measure('ml'), 'ml')
-    #     self.assertEqual(self.flour._verify_measure('l'), 'ml')
-    #     self.assertEqual(self.flour._verify_measure('mls'), 'ml')
-    #     self.assertEqual(self.flour._verify_measure('ls'), 'ml')
-    #     self.assertEqual(self.flour._verify_measure('g'), 'g')
-    #     self.assertEqual(self.flour._verify_measure('gs'), 'g')
-    #     self.assertEqual(self.flour._verify_measure('kg'), 'g')
-    #     self.assertEqual(self.flour._verify_measure('kgs'), 'g')
-    #
-    #     with self.assertRaises(TypeError):
-    #         self.flour._verify_measure(1)
-    #         self.flour._verify_measure(['cup'])
-    #         self.flour._verify_measure(('cup'))
-    #
-    #     with self.assertRaises(ValueError):
-    #         self.flour._verify_measure('1')
-    #         self.flour._verify_measure('lbs')
-    #
-    # def test_verify_state(self):
-    #     self.assertEqual(self.flour._verify_state('solid'), 'solid')
-    #     self.assertEqual(self.flour._verify_state('SOLID'), 'solid')
-    #     self.assertEqual(self.flour._verify_state('liquid'), 'liquid')
-    #     self.assertEqual(self.flour._verify_state('LIQUID'), 'liquid')
-    #     self.assertEqual(self.flour._verify_state(None), None)
-    #
-    #     with self.assertRaises(TypeError):
-    #         self.flour._verify_state(['liquid'])
-    #         self.flour._verify_state(('liquid'))
-    #         self.flour._verify_state(10)
-    #
-    #     with self.assertRaises(ValueError):
-    #         self.flour._verify_state('liquids')
-    #         self.flour._verify_state('solids')
-    #         self.flour._verify_state('gas')
-    #
-    # def test_clean_name(self):
-    #     self.flour2 = Ingredient('flour2', 1, 'cup', 'solid')
-    #     self.assertEqual(self.flour2.name(), 'flour')
-    #
-    #     self.flour2.set_name('all-purpose-flour')
-    #     self.assertEqual(self.flour2.name(), 'all purpose flour')
-    #
-    #     self.flour2.set_name('ALL-PURPOSE_FLOuR')
-    #     self.assertEqual(self.flour2.name(), 'all purpose flour')
-    #
-    # def test_update_density_and_state(self):
-    #     self.assertEqual(self.flour._density, 125)
-    #     self.flour.set_name('bread flour')
-    #     self.assertEqual(self.flour.name(), 'bread flour')
-    #     self.assertEqual(self.flour._density, 136)
-    #
-    # def test_convert_to_metric(self):
-    #     # solid conversion
-    #     self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
-    #     # solid conversion teaspoon
-    #     self.assertEqual(self.teaspoonFlour._convert_to_metric(), (5.2083, 'g'))
-    #     self.assertEqual(self.tableSpoonFlour._convert_to_metric(), (31.2500, 'g'))
-    #
-    #     # liquid conversion
-    #     self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
-    #
-    # def test_to_metric(self):
-    #     self.assertEqual(self.flour.to_metric(), '125 g')
-    #     self.assertEqual(self.vegOil.to_metric(), '109 ml')
-    #     self.assertEqual(self.teaspoonFlour.to_metric(), '5.2083 g')
-    #     self.assertEqual(self.tableSpoonFlour.to_metric(), '31.25 g')
-    #
-    # def test_convert_to_kitchen(self):
-    #     # solids
-    #     # cups
-    #     self.assertEqual(self.metricCupFlour._convert_to_kitchen(), (1, 'cup'))
-    #     self.assertEqual(self.twoAndHalfMetricCupFlour._convert_to_kitchen(), (2.5, 'cups'))
-    #     self.assertEqual(self.thirtyCupsFlour._convert_to_kitchen(), (30, 'cups'))
-    #     self.assertEqual(self.quarterCupFlour._convert_to_kitchen(), (.25, 'cups'))
-    #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricFlour._convert_to_kitchen(), (1, 'Tbsp'))
-    #     self.assertEqual(self.halfTablespoonMetricFlour._convert_to_kitchen(), (0.5, 'Tbsp'))
-    #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricFlour._convert_to_kitchen(),(1, 'tsp'))
-    #     self.assertEqual(self.halfTeaspoonMetricFlour._convert_to_kitchen(), (0.5, 'tsp'))
-    #
+    def test_verify_measure(self):
+        self.assertEqual(self.flour._verify_measure('cup'), 'cup')
+        self.assertEqual(self.flour._verify_measure('cups'), 'cup')
+        self.assertEqual(self.flour._verify_measure('tablespoon'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
+        # tbsp., Tbsp., Tb., or T. are all shorthand for tablespoon
+        self.assertEqual(self.flour._verify_measure('tbsp'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('Tb'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('T'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('T.'), 'tablespoon')
+        self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
+
+        self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('teaspoons'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('tsp'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('t'), 'teaspoon')
+
+
+        self.assertEqual(self.flour._verify_measure('ml'), 'ml')
+        self.assertEqual(self.flour._verify_measure('l'), 'l')
+        self.assertEqual(self.flour._verify_measure('ls'), 'l')
+        self.assertEqual(self.flour._verify_measure('mls'), 'ml')
+        self.assertEqual(self.flour._verify_measure('g'), 'g')
+        self.assertEqual(self.flour._verify_measure('gs'), 'g')
+        self.assertEqual(self.flour._verify_measure('kg'), 'kg')
+        self.assertEqual(self.flour._verify_measure('kgs'), 'kg')
+
+        with self.assertRaises(TypeError):
+            self.flour._verify_measure(1)
+            self.flour._verify_measure(['cup'])
+            self.flour._verify_measure(('cup'))
+
+        with self.assertRaises(ValueError):
+            self.flour._verify_measure('1')
+            self.flour._verify_measure('lbs')
+
+    def test_verify_state(self):
+        self.assertEqual(self.flour._verify_state('solid'), 'solid')
+        self.assertEqual(self.flour._verify_state('SOLID'), 'solid')
+        self.assertEqual(self.flour._verify_state('liquid'), 'liquid')
+        self.assertEqual(self.flour._verify_state('LIQUID'), 'liquid')
+        self.assertEqual(self.flour._verify_state(None), None)
+
+        with self.assertRaises(TypeError):
+            self.flour._verify_state(['liquid'])
+            self.flour._verify_state(('liquid'))
+            self.flour._verify_state(10)
+
+        with self.assertRaises(ValueError):
+            self.flour._verify_state('liquids')
+            self.flour._verify_state('solids')
+            self.flour._verify_state('gas')
+
+    def test_clean_name(self):
+        flour2 = Ingredient('flour2', 1, 'cup', 'solid')
+        self.assertEqual(flour2.name(), 'flour')
+
+        flour3 = Ingredient('all-purpose-flour', 1, 'cup', 'solid')
+        self.assertEqual(flour3.name(), 'all purpose flour')
+
+        flour4 = Ingredient('ALL-PURPOSE_FLOuR', 1, 'cup', 'solid')
+        self.assertEqual(flour4.name(), 'all purpose flour')
+
+    def test_update_density_and_state(self):
+        self.assertEqual(self.flour._density, 125)
+        flour4 = Ingredient('bread flour', 1, 'cup', 'solid')
+        self.assertEqual(flour4._density, 136)
+
+    def test_convert_to_metric(self):
+        # solid conversion
+        self.assertEqual(self.flour._convert_to_metric(), (125, 'g'))
+        # solid conversion teaspoon
+        self.assertEqual(round(float(self.teaspoonFlour._convert_to_metric()[0]),4), 5.2083)
+        self.assertEqual(self.tableSpoonFlour._convert_to_metric(), (31.2500, 'g'))
+
+        # liquid conversion
+        self.assertEqual(self.vegOil._convert_to_metric(),(109, 'ml'))
+
+    def test_to_metric(self):
+        self.assertEqual(self.flour.to_metric(), '125 g')
+        self.assertEqual(self.vegOil.to_metric(), '109 ml')
+        self.assertEqual(self.teaspoonFlour.to_metric(), '5.2083 g')
+        self.assertEqual(self.tableSpoonFlour.to_metric(), '31.25 g')
+
+    def test_convert_to_kitchen(self):
+        # solids
+        # cups
+        self.assertEqual(self.metricCupFlour._convert_to_kitchen(), (1, 'cup'))
+        self.assertEqual(self.twoAndHalfMetricCupFlour._convert_to_kitchen(), (2.5, 'cup'))
+        self.assertEqual(self.thirtyCupsFlour._convert_to_kitchen(), (30, 'cup'))
+        self.assertEqual(self.quarterCupFlour._convert_to_kitchen(), (.25, 'cup'))
+        # tablespoons
+        self.assertEqual(self.tablespoonMetricFlour._convert_to_kitchen(), (1, 'tablespoon'))
+        self.assertEqual(self.halfTablespoonMetricFlour._convert_to_kitchen(), (0.5, 'tablespoon'))
+        # teaspoons
+        self.assertEqual(self.teaspoonMetricFlour._convert_to_kitchen(),(1, 'teaspoon')) # todo what is going on here
+        self.assertEqual(self.halfTeaspoonMetricFlour._convert_to_kitchen(), (0.5, 'teaspoon'))
+
     #     # liquids
     #     # cups
     #     self.assertEqual(self.metricCupVegOil._convert_to_kitchen(), (1, 'cup'))

@@ -186,8 +186,8 @@ class Ingredient:
             measure = measure[0:-1]
             if measure not in POSSIBLE_VALUES:
                 raise ValueError("measure must be either 'cup', 'tablespoon', "
-                                 "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg' but"
-                                 f"is {measure}")
+                                 "'teaspoon', 'tsp' 'ml', 'l', 'g', or 'kg' "
+                                 f"but is {measure}")
 
 
         if measure in ('tablespoon', 'tbsp', 'tb'):
@@ -405,7 +405,7 @@ class Ingredient:
             return f"{self._metricAmount} {measure}"
         elif measure in ('cup', 'teaspoon', 'tablespoon') :
             amount, measure = self._convert_to_metric()
-            return f"{amount} {measure}"
+            return f"{self._format_amount(amount)} {measure}"
         else:
             raise Exception(f".self._kitchenMeasure: {measure} "
                             "is not a possible value")
@@ -440,7 +440,7 @@ class Ingredient:
             raise Exception(f"self._kitchenMeasure: {self._kitchenMeasure} is "
                             "not a possible value.")
 
-        amount = self._kitchenAmount * self._density * conversionFactor
+        amount = self._convert_to_fraction(self._kitchenAmount * self._density * conversionFactor)
 
         if self._state == 'solid':
             return amount, 'g'
