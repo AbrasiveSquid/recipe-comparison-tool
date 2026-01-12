@@ -249,3 +249,8 @@ class TestIngredient(unittest.TestCase):
         self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
 
 
+    def test_difference(self):
+        self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour), ('-1.5', 'cup'))
+        self.assertEqual(self.flour.difference(self.tablespoonMetricFlour), ('16', 'tablespoon'))
+
+

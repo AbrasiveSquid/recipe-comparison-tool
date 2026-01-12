@@ -63,11 +63,12 @@ class Ingredient:
         if measure:
             self._state = self._verify_state(ingState)
             self._set_density_and_state_for_ingredient()
+            self._set_amounts_and_measures(amount, measure)
+
         else:  # dimensionless ingredient, eg. 1 large egg
             self._state = 'thing'
-
-        # TODO have this method call methods to set amounts and measures
-        self._set_amounts_and_measures(amount, measure)
+            self._metricAmount = amount
+            self._kitchenAmount = amount
 
         self._add_keywords()
 
@@ -532,10 +533,20 @@ class Ingredient:
                 return True
         return False
 
-    def difference(self, other) -> str:
+    def difference(self, other, kitchenMeasure:bool=True) -> tuple:
         """
         normalizes other to self and returns the difference + or - that other
         is compared to self
+
+        Parameters:
+            other:
+                Ingredient
+
+            kitchenMeasure:
+                bool:
+                    default: True
+                        flag to determine if difference returned as kitchen
+                        measurement or metric measurement
 
         Precondition:
             other must be an Ingredient
@@ -549,15 +560,16 @@ class Ingredient:
                 if other is not a comparable ingredient
                 if other is not the correct ._state
         """
-        # if not isinstance(other, Ingredient):
-        #     raise TypeError("other must be an Ingredient but is a "
-        #                     f"{type(other)}")
-        # # constants
-        # KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
-        # METRIC_MEASURES = ('ml', 'g')
-        #
-        #
-        # if (other.measure() in KITCHEN_MEASURES
-        #     and self.measure() in KITCHEN_MEASURES):
-        #
+        if not isinstance(other, Ingredient):
+            raise TypeError("other must be an Ingredient but is a "
+                            f"{type(other)}")
+
+        if kitchenMeasure:
+            if self._kitchenMeasure == other._kitchenMeasure:
+                amountDiff = self._kitchenAmount - other._kitchenAmount
+                return f"{float(amountDiff):.2g}", self._kitchenMeasure
+            # need to convert between
+
+    def _convert_to_tablespoon(self) -> fractions.Fraction:
+        """"""
         pass

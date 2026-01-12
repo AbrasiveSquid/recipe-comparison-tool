@@ -18,6 +18,7 @@
   "olive oil": { "density": 216, "state": "liquid" },
   "coconut oil": { "density": 218, "state": "solid" },
   "canola oil": { "density": 218, "state": "liquid" },
+  "oil": { "density": 218, "state": "liquid" },
   "ghee": { "density": 210, "state": "solid" },
   "duck fat": { "density": 200, "state": "solid" },
   "all-purpose flour": { "density": 125, "state": "solid" },
