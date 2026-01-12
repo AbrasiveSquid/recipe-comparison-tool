@@ -298,23 +298,22 @@ class Ingredient:
                 cleanName += ' '
         return cleanName
 
-    def to_kitchen_measurement(self) -> str:
-        """
-        returns a string of the measurement with number of cups or tablespoons
-        or teaspoons depending on the amount
-        """
-        if self._state == 'thing':
-            return ''
-
-        measure = self._measure
-        if measure == 'cup':
-            return f"{self._amount} {measure}"
-        elif measure == 'g' or measure == 'ml':
-            amount, measure = self._convert_to_kitchen()
-            return f"{amount} {measure}"
-        else:
-            raise Exception(f"._measure: {self._measure} is not a possible "
-                            "value")
+    # def to_kitchen_measurement(self) -> str:
+    #     """
+    #     returns a string of the measurement with number of cups or tablespoons
+    #     or teaspoons depending on the amount
+    #     """
+    #     if self._state == 'thing':
+    #         return ''
+    #
+    #     measure = self.metric_measure()
+    #
+    #     if measure == 'g' or measure == 'ml':
+    #         amount, measure = self._convert_to_kitchen()
+    #         return f"{amount} {measure}"
+    #     else:
+    #         raise Exception(f"._measure: {self._measure} is not a possible "
+    #                         "value")
 
     def _add_keywords(self) -> None:
         """
@@ -383,15 +382,15 @@ class Ingredient:
             # if formattedAmount != 1: # TODO come back and figure out how to handle this
             #     return amount, 'cups'
             # else:
-            return amount, 'cup'
+            return amount.limit_denominator(48), 'cup'
 
         elif QUARTER_CUP > amount >= TABLESPOON_TO_CUP / 2:
             # amount is between 1/2 tablespoon and 1/4 cup
             amount = amount * (1/TABLESPOON_TO_CUP)
-            return amount, 'tablespoon'
+            return amount.limit_denominator(12), 'tablespoon'
         else:
             amount = amount * (1/TEASPOON_TO_CUP)
-            return amount, 'teaspoon'
+            return amount.limit_denominator(8), 'teaspoon'
 
     def to_metric(self) -> str:
         """
@@ -471,7 +470,7 @@ class Ingredient:
                             f"int or float or an int or float")
         try:
             float(value)
-            return fractions.Fraction(str(value))
+            return fractions.Fraction(str(value)).limit_denominator(48)
         except ValueError:
             raise ValueError(f"value: {(value)} be a str that represents a "
                              f"int or float")

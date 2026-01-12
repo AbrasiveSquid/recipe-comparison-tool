@@ -96,7 +96,7 @@ class Recipe:
     def is_empty(self) -> bool:
         return len(self._ingredients) == 0
 
-    def compare_recipe(self, other:Recipe) -> str:
+    def compare_recipe(self, other) -> str:
         """
         compares this recipe with another recipe by finding all same or similar
         ingredients and returning a string with the ingredients for each recipe

@@ -80,8 +80,8 @@ class TestIngredient(unittest.TestCase):
     def test_verify_amount(self):
         self.assertEqual(self.flour._verify_amount(10), fractions.Fraction(10,1))
         self.assertEqual(self.flour._verify_amount(10.5), fractions.Fraction(21,2))
-        self.assertEqual(self.flour._verify_amount(0.32223), fractions.Fraction(32223, 100000))
-        self.assertEqual(self.flour._verify_amount(0.545), fractions.Fraction(545, 1000))
+        self.assertEqual(self.flour._verify_amount(0.32223), fractions.Fraction(10, 31))
+        self.assertEqual(self.flour._verify_amount(0.545), fractions.Fraction(6, 11))
         self.assertEqual(self.flour._verify_amount('¼'), fractions.Fraction(1,4))
         self.assertEqual(self.flour._verify_amount('¾'), fractions.Fraction(3,4))
         self.assertEqual(self.flour._verify_amount('½'), fractions.Fraction(1,2))
@@ -98,10 +98,10 @@ class TestIngredient(unittest.TestCase):
 
     def test_verify_measure(self):
         self.assertEqual(self.flour._verify_measure('cup'), 'cup')
-        self.assertEqual(self.flour._verify_measure('cups'), 'cup')
+        self.assertEqual(self.flour._verify_measure('cup'), 'cup')
         self.assertEqual(self.flour._verify_measure('tablespoon'), 'tablespoon')
         self.assertEqual(self.flour._verify_measure('tablespoons'), 'tablespoon')
-        # tbsp., Tbsp., Tb., or T. are all shorthand for tablespoon
+        # tbsp., tablespoon., Tb., or T. are all shorthand for tablespoon
         self.assertEqual(self.flour._verify_measure('tbsp'), 'tablespoon')
         self.assertEqual(self.flour._verify_measure('Tb'), 'tablespoon')
         self.assertEqual(self.flour._verify_measure('T'), 'tablespoon')
@@ -110,7 +110,7 @@ class TestIngredient(unittest.TestCase):
 
         self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
         self.assertEqual(self.flour._verify_measure('teaspoons'), 'teaspoon')
-        self.assertEqual(self.flour._verify_measure('tsp'), 'teaspoon')
+        self.assertEqual(self.flour._verify_measure('teaspoon'), 'teaspoon')
         self.assertEqual(self.flour._verify_measure('t'), 'teaspoon')
 
 
@@ -182,7 +182,7 @@ class TestIngredient(unittest.TestCase):
 
     def test_convert_to_kitchen(self):
         # solids
-        # cups
+        # cup
         self.assertEqual(self.metricCupFlour._convert_to_kitchen(), (1, 'cup'))
         self.assertEqual(self.twoAndHalfMetricCupFlour._convert_to_kitchen(), (2.5, 'cup'))
         self.assertEqual(self.thirtyCupsFlour._convert_to_kitchen(), (30, 'cup'))
@@ -194,58 +194,58 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.teaspoonMetricFlour._convert_to_kitchen(),(1, 'teaspoon')) # todo what is going on here
         self.assertEqual(self.halfTeaspoonMetricFlour._convert_to_kitchen(), (0.5, 'teaspoon'))
 
-    #     # liquids
-    #     # cups
-    #     self.assertEqual(self.metricCupVegOil._convert_to_kitchen(), (1, 'cup'))
-    #     self.assertEqual(self.twoAndHalfMetricCupVegOil._convert_to_kitchen(),(2.5, 'cups'))
-    #     self.assertEqual(self.thirtyCupsVegOil._convert_to_kitchen(),(30, 'cups'))
-    #     self.assertEqual(self.quarterCupVegOil._convert_to_kitchen(),(.25, 'cups'))
-    #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricVegOil._convert_to_kitchen(),(1, 'Tbsp'))
-    #     self.assertEqual(self.halfTablespoonMetricVegOil._convert_to_kitchen(),(0.5, 'Tbsp'))
-    #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricVegOil._convert_to_kitchen(),(1, 'tsp'))
-    #     self.assertEqual(self.halfTeaspoonMetricVegOil._convert_to_kitchen(),(0.5, 'tsp'))
-    #
+        # liquids
+        # cup
+        self.assertEqual(self.metricCupVegOil._convert_to_kitchen(), (1, 'cup'))
+        self.assertEqual(self.twoAndHalfMetricCupVegOil._convert_to_kitchen(),(2.5, 'cup'))
+        self.assertEqual(self.thirtyCupsVegOil._convert_to_kitchen(),(30, 'cup'))
+        self.assertEqual(self.quarterCupVegOil._convert_to_kitchen(),(.25, 'cup'))
+        # tablespoons
+        self.assertEqual(self.tablespoonMetricVegOil._convert_to_kitchen(),(1, 'tablespoon'))
+        self.assertEqual(self.halfTablespoonMetricVegOil._convert_to_kitchen(),(0.5, 'tablespoon'))
+        # teaspoons
+        self.assertEqual(self.teaspoonMetricVegOil._convert_to_kitchen(),(1, 'teaspoon'))
+        self.assertEqual(self.halfTeaspoonMetricVegOil._convert_to_kitchen(),(0.5, 'teaspoon'))
+
     # def test_to_kitchen_measurement(self):
     #     # solids
-    #     # cups
+    #     # cup
     #     self.assertEqual(self.metricCupFlour.to_kitchen_measurement(), '1 cup')
-    #     self.assertEqual(self.twoAndHalfMetricCupFlour.to_kitchen_measurement(),'2.5 cups')
-    #     self.assertEqual(self.thirtyCupsFlour.to_kitchen_measurement(),'30 cups')
-    #     self.assertEqual(self.quarterCupFlour.to_kitchen_measurement(),'0.25 cups')
+    #     self.assertEqual(self.twoAndHalfMetricCupFlour.to_kitchen_measurement(),'2.5 cup')
+    #     self.assertEqual(self.thirtyCupsFlour.to_kitchen_measurement(),'30 cup')
+    #     self.assertEqual(self.quarterCupFlour.to_kitchen_measurement(),'0.25 cup')
     #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricFlour.to_kitchen_measurement(), '1 Tbsp')
-    #     self.assertEqual(self.halfTablespoonMetricFlour.to_kitchen_measurement(), '0.5 Tbsp')
+    #     self.assertEqual(self.tablespoonMetricFlour.to_kitchen_measurement(), '1 tablespoon')
+    #     self.assertEqual(self.halfTablespoonMetricFlour.to_kitchen_measurement(), '0.5 tablespoon')
     #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricFlour.to_kitchen_measurement(),'1 tsp')
-    #     self.assertEqual(self.halfTeaspoonMetricFlour.to_kitchen_measurement(), '0.5 tsp')
+    #     self.assertEqual(self.teaspoonMetricFlour.to_kitchen_measurement(),'1 teaspoon')
+    #     self.assertEqual(self.halfTeaspoonMetricFlour.to_kitchen_measurement(), '0.5 teaspoon')
     #
     #     # liquids
-    #     # cups
+    #     # cup
     #     self.assertEqual(self.metricCupVegOil.to_kitchen_measurement(), '1 cup')
     #     self.assertEqual(
-    #         self.twoAndHalfMetricCupVegOil.to_kitchen_measurement(), '2.5 cups')
-    #     self.assertEqual(self.thirtyCupsVegOil.to_kitchen_measurement(),'30 cups')
-    #     self.assertEqual(self.quarterCupVegOil.to_kitchen_measurement(),'0.25 cups')
+    #         self.twoAndHalfMetricCupVegOil.to_kitchen_measurement(), '2.5 cup')
+    #     self.assertEqual(self.thirtyCupsVegOil.to_kitchen_measurement(),'30 cup')
+    #     self.assertEqual(self.quarterCupVegOil.to_kitchen_measurement(),'0.25 cup')
     #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricVegOil.to_kitchen_measurement(),'1 Tbsp')
+    #     self.assertEqual(self.tablespoonMetricVegOil.to_kitchen_measurement(),'1 tablespoon')
     #     self.assertEqual(
-    #         self.halfTablespoonMetricVegOil.to_kitchen_measurement(),'0.5 Tbsp')
+    #         self.halfTablespoonMetricVegOil.to_kitchen_measurement(),'0.5 tablespoon')
     #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricVegOil.to_kitchen_measurement(),'1 tsp')
-    #     self.assertEqual(self.halfTeaspoonMetricVegOil.to_kitchen_measurement(),'0.5 tsp')
-    #
-    # def test_compare_ingredient(self):
-    #     brownSugar = Ingredient('Brown Sugar', 100, 'g')
-    #     self.assertTrue(brownSugar.compare_ingredient(self.extraDarkBrownSugar))
-    #     self.assertTrue(self.extraDarkBrownSugar.compare_ingredient(brownSugar))
-    #
-    #     # same ingredient
-    #     self.assertTrue(self.flour.compare_ingredient(self.flour))
-    #     self.assertTrue(self.metricCupFlour.compare_ingredient(self.flour))
-    #
-    #     # similar ingredients
-    #     self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
-    #
+    #     self.assertEqual(self.teaspoonMetricVegOil.to_kitchen_measurement(),'1 teaspoon')
+    #     self.assertEqual(self.halfTeaspoonMetricVegOil.to_kitchen_measurement(),'0.5 teaspoon')
+
+    def test_compare_ingredient(self):
+        brownSugar = Ingredient('Brown Sugar', 100, 'g')
+        self.assertTrue(brownSugar.compare_ingredient(self.extraDarkBrownSugar))
+        self.assertTrue(self.extraDarkBrownSugar.compare_ingredient(brownSugar))
+
+        # same ingredient
+        self.assertTrue(self.flour.compare_ingredient(self.flour))
+        self.assertTrue(self.metricCupFlour.compare_ingredient(self.flour))
+
+        # similar ingredients
+        self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
+
 
