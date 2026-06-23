@@ -564,12 +564,57 @@ class Ingredient:
             raise TypeError("other must be an Ingredient but is a "
                             f"{type(other)}")
 
+        if self._state == "thing":
+            amountDiff = self._kitchenAmount - other._kitchenAmount
+            return f"{round(float(amountDiff),2):g}", ""
+
         if kitchenMeasure:
             if self._kitchenMeasure == other._kitchenMeasure:
                 amountDiff = self._kitchenAmount - other._kitchenAmount
-                return f"{float(amountDiff):.2g}", self._kitchenMeasure
-            # need to convert between
+                return f"{round(float(amountDiff),2):g}", self._kitchenMeasure
+
+            # find smallest shared unit, convert and return difference
+            else:
+                if self._kitchenMeasure == "teaspoon" or other._kitchenMeasure == "teaspoon":
+                    # convert to teaspoon
+                    amountDiff = self._convert_to_teaspoon() - other._convert_to_teaspoon()
+                    return f"{round(float(amountDiff),2):g}", "teaspoon"
+                else:
+                    # convert to tablespoon, won;t convert to cup as one has to be too small
+                    amountDiff = self._convert_to_tablespoon() - other._convert_to_tablespoon()
+                    return f"{round(float(amountDiff),2):g}", "tablespoon"
+
+        else:
+            if self._metricMeasure != other._metricMeasure:
+                raise ValueError(f"Measurements must be the same. {self._metricMeasure} != {other._metricMeasure}")
+            amountDiff = self._metricAmount - other._metricAmount
+            return f"{round(float(amountDiff),2):g}", self._metricMeasure
+
+
+
+    def _convert_to_teaspoon(self) -> fractions.Fraction:
+        """
+        converts a kitchen measurement to the amount in teaspoons and returns it
+        """
+        if self._kitchenMeasure == "teaspoon":
+            return self._kitchenAmount
+        elif self._kitchenMeasure == "tablespoon":
+            return self._kitchenAmount * 3
+        elif self._kitchenMeasure == "cup":
+            return self._kitchenAmount * 48
+        else:
+            raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, or teaspoon, but was {self._kitchenMeasure}")
+
 
     def _convert_to_tablespoon(self) -> fractions.Fraction:
-        """"""
-        pass
+        """
+        converts a kitchen measurement to the amount in tablespoons and returns it
+        """
+        if self._kitchenMeasure == "tablespoon":
+            return self._kitchenAmount
+        elif self._kitchenMeasure == "teaspoon":
+            return self._kitchenAmount / 3
+        elif self._kitchenMeasure == "cup":
+            return self._kitchenAmount * 16
+        else:
+            raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, or teaspoon, but was {self._kitchenMeasure}")
