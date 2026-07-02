@@ -18,7 +18,7 @@ class Recipe:
     """
     this is the recipe class
     """
-    def __init__(self, title:str, source:str, ingredientList:list, steps:str):
+    def __init__(self, title:str, source:str, ingredientList:list, steps:list):
         self._title = title
         self._source = source
         self._instructions = steps
@@ -88,14 +88,23 @@ class Recipe:
         """
         resultStr = f"Recipe: {self._title} from {self._source}\n"
         resultStr += self.ingredient_str()
-        resultStr += f"\n**Instructions**\n{self._instructions}\n"
+        resultStr += f"\n**Instructions**\n{self._format_instructions()}"
 
         return resultStr
+
+    def _format_instructions(self) -> str:
+        """
+        returns a print friendly string of the instructions as steps
+        """
+        instructions = ""
+        for i in (range(len(self._instructions))):
+            instructions += f"{i+1}. {self._instructions[i]}\n"
+        return instructions
 
     def is_empty(self) -> bool:
         return len(self._ingredients) == 0
 
-    def compare_recipe(self, other) -> str:
+    def compare_recipe(self, other) -> str: # TODO Gets stuck in a loop, or just takes a long time, need to DEBUG
         """
         compares this recipe with another recipe by finding all same or similar
         ingredients and returning a string with the ingredients for each recipe
