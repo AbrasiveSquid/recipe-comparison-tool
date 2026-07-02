@@ -505,12 +505,12 @@ class Ingredient:
         returns print friendly str representation of an ingredient
         """
         if self._state == 'thing': # dimensionless
-            if self._amount == 0:
+            if self._kitchen_amount == 0:
                 return f"{self._name}"
             else:
-                return f"{self._amount} {self._name}"
+                return f"{self._kitchen_amount} {self._name}"
         else:
-            return f"{self._amount} {self._measure} {self._name}"
+            return f"{self._kitchen_amount} {self._kitchenMeasure} {self._name}"
 
     def compare_ingredient(self, other) -> bool:
         """

@@ -44,7 +44,6 @@ class Recipe:
             elif parsed.name:
                 for optionalIngredient in parsed.name: # no qty available
                     self._optionalIngredients.append(Ingredient(optionalIngredient.text, 0, 0))
-
             else:
                 raise ValueError(f"No quantity found: {ingredient}")
 
@@ -130,8 +129,7 @@ class Recipe:
 
             for i in range(len(otherRecipe)):
                 if thisIngredient.compare_ingredient(otherRecipe[i]):
-                    ingredientPairs.append((thisIngredient,
-                                            otherRecipe.pop(i)))
+                    ingredientPairs.append((thisIngredient, otherRecipe.pop(i)))
                     break
             else:
                 # if no similar ingredient found, add with None, output will
@@ -160,7 +158,5 @@ class Recipe:
                 #  to same measurement than returns the difference +/-
                 resultStr += (f"{str(pair[0])}\t\t\t{str(pair[1])}\t\t"
                                f"{pair[0].difference(pair[1])}")
-                                # TODO write difference method
-
         return resultStr
 
