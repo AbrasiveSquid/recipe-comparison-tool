@@ -37,6 +37,15 @@ class TestIngredient(unittest.TestCase):
         self.teaspoonMetricVegOil = Ingredient('vegetable oil', 4.5416666667, 'g')
         self.halfTeaspoonMetricVegOil = Ingredient('vegetable oil', 2.2708333333, 'g')
 
+        # stateless
+        self.oneEgg = Ingredient("Egg", 1, "")
+        self.twoEggs = Ingredient("egGs", 2, "")
+        self.onePotato = Ingredient("potatoes", 1, "")
+        self.sixPotatoes = Ingredient("potatoes", 6, "")
+        self.oneBlackBerry = Ingredient("black berries", 1, "")
+        self.tenBlueBerries = Ingredient("blue berries", 10, "")
+
+
     def test_ingredient_init(self):
         # flour test
         self.assertEqual(self.flour.name(), 'flour')
@@ -75,6 +84,13 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.whiteSugar.keywords(), ['white sugar'])
         self.assertEqual(self.icingSugar.keywords(), ['icing', 'sugar'])
         self.assertEqual(self.allPurposeFlour.keywords(), ['flour'])
+        self.assertEqual(self.twoEggs.keywords(), ['egg'])
+        self.assertEqual(self.onePotato.keywords(), ["potato"])
+        self.assertEqual(self.sixPotatoes.keywords(), ["potato"])
+        self.assertEqual(self.oneBlackBerry.keywords(), ["black", "berry"])
+        self.assertEqual(self.tenBlueBerries.keywords(), ["blue", "berry"])
+
+
 
 
     def test_verify_amount(self):

@@ -1,5 +1,6 @@
 import json
 import fractions
+import inflect
 
 class Ingredient:
     """
@@ -321,6 +322,7 @@ class Ingredient:
         adds all keywords from self._name to self._keywords.
         keywords are words that are not adjectives such as 'all', 'coarse',
         'virgin', etc
+        removes plural from a keyword
         """
         # constant
         FILLER_WORDS = ('all', 'purpose', 'extra', 'large', 'small', 'medium',
@@ -342,6 +344,26 @@ class Ingredient:
             self._keywords = ['white sugar']
         elif self._keywords == ['brown', 'sugar']:
             self._keywords = ['brown sugar']
+        elif self._keywords == ['baking', 'soda']:
+            self._keywords = ['baking soda']
+        elif self._keywords == ['baking', 'powder']:
+            self._keywords = ['baking powder']
+
+        # remove keyword plural
+        self._unpluralize_keywords()
+
+    def _unpluralize_keywords(self):
+        """
+        goes through the current self._keywords and removes any plurals, to
+        ensure comparison with other ingredients
+        """
+        if len(self._keywords) == 0:
+            return
+
+        p = inflect.engine()
+        for i in range(len(self._keywords)):
+            word = self._keywords[i]
+            self._keywords[i] = p.singular_noun(word) or word
 
 
     def keywords(self) -> list:

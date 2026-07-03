@@ -146,20 +146,21 @@ class Recipe:
                 ingredientPairs.append((thisIngredient, None))
 
         # if either recipe has remaining ingredients add to list
-        while len(thisRecipe):
-            for ingredient in thisRecipe:
-                ingredientPairs.append((ingredient, None))
 
-        while len(otherRecipe):
-            for ingredient in otherRecipe:
-                ingredientPairs.append((None, ingredient))
+        for ingredient in thisRecipe:
+            ingredientPairs.append((ingredient, None))
+
+
+        for ingredient in otherRecipe:
+            ingredientPairs.append((None, ingredient))
 
         # format output
         resultStr = ''
 
         for pair in ingredientPairs:
+            resultStr += "\n"
             if pair[0] is None:
-                resultStr += f"\t\t\t{str(pair[1])}"
+                resultStr += f"\n\t\t\t{str(pair[1])}"
             elif pair[1] is None:
                 resultStr += f"{str(pair[0])}"
             else:
@@ -169,3 +170,34 @@ class Recipe:
                                f"{pair[0].difference(pair[1])}")
         return resultStr
 
+
+sally = Recipe("Sally's Cornbread", "x", ['1 cup (120g) fine cornmeal',
+                                          '1 cup (125g) all-purpose flour (spooned & leveled)',
+                                          '1 teaspoon baking powder', '1/2 teaspoon baking soda',
+                                          '1/8 teaspoon salt',
+                                          '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled',
+                                          '1/3 cup (67g) packed light or dark brown sugar',
+                                          '2 Tablespoons (30ml) honey',
+                                          '1 large egg, at room temperature',
+                                          '1 cup (240ml) buttermilk, at room temperature*'
+                                          ],
+               ["Preheat oven to 400°F (204°C). Grease and lightly flour a 9-inch square baking pan. Set aside.",
+               "Whisk the cornmeal, flour, baking powder, baking soda, and salt together in a large bowl. Set aside. In a medium bowl, whisk the melted butter, brown sugar, and honey together until completely smooth and thick. Then, whisk in the egg until combined. Finally, whisk in the buttermilk. Pour the wet ingredients into the dry ingredients and whisk until combined. Avoid over-mixing.",
+               "Pour batter into prepared baking pan. Bake for 20 minutes or until golden brown on top and the center is cooked through. Use a toothpick to test. Edges should be crispy at this point. Allow to slightly cool before slicing and serving. Serve cornbread with butter, honey, jam, or whatever you like.",
+               "Wrap leftovers up tightly and store at room temperature for up to 1 week."]
+               )
+moist = Recipe("Moise Cornbread", "y",['2 ½ cups flour', '1 cup cornmeal', '1 cup sugar',
+                        '1 ½ tablespoons baking powder', '1 teaspoon salt',
+                        '½ cup (8 tablespoons) butter (melted)', '½ cup oil',
+                        '1 ¼ cups milk', '3 large eggs',
+                        'honey and extra butter for serving (optional)'],
+               ["Preheat oven to 350 degrees and grease a 9x13 inch pan.",
+                "In a large bowl whisk together flour, cornmeal, sugar, baking powder, and salt.",
+                "In a medium bowl mix together butter, oil, milk, and eggs.",
+                "Add wet ingredients to dry ingredients and mix until combined.",
+                "Transfer batter to your prepared pan. Bake for 35-45 minutes until golden and a toothpick inserted in the middle comes out clean or with only a few crumbs (no wet batter).",
+                "Allow to cool for 15-20 minutes in the pan before cutting into squares and serving. Serve with butter and honey if desired. Store in airtight container at room temperature up to 3 days or in the fridge for 1 week."
+                ]
+               )
+
+print(sally.compare_recipe(moist))
