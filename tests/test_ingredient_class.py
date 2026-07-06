@@ -269,9 +269,9 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour), ('-1.5', 'cup'))
         self.assertEqual(self.flour.difference(self.tablespoonMetricFlour), ('15', 'tablespoon'))
         self.assertEqual(self.extraVirginOliveOil.difference(self.vegOil), ('-0.04', 'cup'))
-        self.assertEqual(self.extraVirginOliveOil.difference(self.extraVirginOliveOil, False), ('0', 'ml'))
-        self.assertEqual(self.flour.difference(self.metricCupFlour, False), ('0', 'g'))
-        self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour, False), ('-187.5', 'g'))
+        self.assertEqual(self.extraVirginOliveOil.difference(self.extraVirginOliveOil, False, True), ('0', 'ml'))
+        self.assertEqual(self.flour.difference(self.metricCupFlour, False, True), ('0', 'g'))
+        self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour, False, True), ('-187.5', 'g'))
 
 
     def test_clone(self):

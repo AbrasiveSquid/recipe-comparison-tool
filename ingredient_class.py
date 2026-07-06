@@ -59,6 +59,7 @@ class Ingredient:
         self._metricMeasure = None
         self._density = None
         self._state = None
+        self._defaultMeasure = None
         self._keywords = []
 
         if measure:
@@ -67,7 +68,7 @@ class Ingredient:
             self._set_amounts_and_measures(amount, measure)
 
         else:  # dimensionless ingredient, eg. 1 large egg
-            self._state = 'thing'
+            self._state = "thing"
             self._metricAmount = amount
             self._kitchenAmount = amount
 
@@ -93,8 +94,11 @@ class Ingredient:
             metricAmount, metricMeasure = self._convert_to_metric()
             self._metricAmount = self._convert_to_fraction(metricAmount)
             self._metricMeasure = metricMeasure
+            self._defaultMeasure = "kitchen"
 
         elif measure in METRIC_MEASURES:
+            self._defaultMeasure = "metric"
+
             if measure in ('ml', 'g'):
                 self._metricAmount = self._verify_amount(amount)
                 self._metricMeasure = measure
@@ -565,7 +569,8 @@ class Ingredient:
                 return True
         return False
 
-    def difference(self, other, kitchenMeasure:bool=True) -> tuple:
+    def difference(self, other, kitchenMeasure:bool=False,
+                   metricMeasure:bool=False) -> tuple:
         """
         normalizes other to self and returns the difference + or - that other
         is compared to self
@@ -576,9 +581,15 @@ class Ingredient:
 
             kitchenMeasure:
                 bool:
-                    default: True
+                    default: false
                         flag to determine if difference returned as kitchen
-                        measurement or metric measurement
+                        measurement
+
+          metricMeasure:
+            bool:
+                default: false
+                    flag to determine if difference returned as kitchen
+                    metric measurement
 
         Precondition:
             other must be an Ingredient
@@ -601,28 +612,74 @@ class Ingredient:
             return f"{round(float(amountDiff),2):g}", ""
 
         if kitchenMeasure:
-            if self._kitchenMeasure == other._kitchenMeasure:
-                amountDiff = self._kitchenAmount - other._kitchenAmount
-                return f"{round(float(amountDiff),2):g}", self._kitchenMeasure
-
-            # find smallest shared unit, convert and return difference
+            amountDiff = self._kitchen_difference(other)
+        elif metricMeasure:
+            amountDiff = self._metric_difference(other)
+        elif self._defaultMeasure == other._defaultMeasure:
+            if self._defaultMeasure == "metric":
+                amountDiff = self._metric_difference(other)
             else:
-                if self._kitchenMeasure == "teaspoon" or other._kitchenMeasure == "teaspoon":
-                    # convert to teaspoon
-                    amountDiff = self._convert_to_teaspoon() - other._convert_to_teaspoon()
-                    return f"{round(float(amountDiff),2):g}", "teaspoon"
-                else:
-                    # convert to tablespoon, won;t convert to cup as one has to be too small
-                    amountDiff = self._convert_to_tablespoon() - other._convert_to_tablespoon()
-                    return f"{round(float(amountDiff),2):g}", "tablespoon"
-
+                amountDiff = self._kitchen_difference(other)
         else:
-            if self._metricMeasure != other._metricMeasure:
-                raise ValueError(f"Measurements must be the same. {self._metricMeasure} != {other._metricMeasure}")
-            amountDiff = self._metricAmount - other._metricAmount
-            return f"{round(float(amountDiff),2):g}", self._metricMeasure
+             # returns kitchen measurement if not equal
+            amountDiff = self._kitchen_difference(other)
+        return f"{round(float(amountDiff[0]), 2):g}", amountDiff[1]
 
 
+    def _metric_difference(self, other) -> tuple:
+        """
+        returns the difference of the metric amount between two ingredients
+        as a tuple with the amount difference between self and other as
+        the first element and the shared unit as the second element
+        """
+        amountDiff = self._metricAmount - other._metricAmount
+        return amountDiff, self._metricMeasure
+
+
+
+    def _kitchen_difference(self, other) -> tuple:
+        """
+        returns the difference in the largest shared unit of two measurements
+        in kitchen units
+
+        Parameters:
+                firstMeasure:
+                    tuple: of two elements. First element is a
+                    fraction.Fraction. Second element is a kitchen measurement
+                    such as ('cup', 'teaspoon', 'tablespoon')
+
+        Returns:
+                tuple: of two elements. First element is the difference as
+                a fractions.Fractions between the fristMeasure and
+                secondMeasure. Second element is the largest possible shared
+                unit.
+                Example:
+                    firstMeasure: (1/2, "cup")
+                    secondMeasure: (1, "cup")
+                    returns: (-1/2, "cup")
+
+                    example2:
+                     firstMeasure: (1, "tablespoon")
+                    secondMeasure: (2, "teaspoon")
+                    returns: (1, "teaspoon")
+        """
+        if self.kitchen_measure() == other.kitchen_measure():
+            amountDiff = self.kitchen_amount() - other.kitchen_amount()
+            return amountDiff, self._kitchenMeasure
+
+        # find smallest shared unit, convert and return difference
+        else:
+            if (self.kitchen_measure() == "teaspoon"
+                    or other.kitchen_measure() == "teaspoon"):
+                # convert to teaspoon
+                amountDiff = (self._convert_to_teaspoon()
+                              - other._convert_to_teaspoon())
+                return amountDiff, "teaspoon"
+            else:
+                # convert to tablespoon, as one has to be less than cup
+                amountDiff = (self._convert_to_tablespoon()
+                              - other._convert_to_tablespoon())
+                return amountDiff, "tablespoon"
 
     def _convert_to_teaspoon(self) -> fractions.Fraction:
         """

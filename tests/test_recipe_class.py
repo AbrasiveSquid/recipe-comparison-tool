@@ -25,6 +25,10 @@ class TestRecipe(unittest.TestCase):
                         '3.5 teaspoons baking powder', '1 teaspoon salt',
                         '1 cup milk', '0.33333334326744 cup vegetable oil',
                         '1 large egg']
+
+        ingredients4 = ["1 egg", "3/4 cup white sugar", "25 ml olive oil"]
+        ingredients5 = ["3 eggs", "100 g white sugar", "50 g brown sugar"]
+
         self.steps1 = ["Preheat oven to 400°F (204°C). Grease and lightly flour a 9-inch square baking pan. Set aside.",
 "Whisk the cornmeal, flour, baking powder, baking soda, and salt together in a large bowl. Set aside. In a medium bowl, whisk the melted butter, brown sugar, and honey together until completely smooth and thick. Then, whisk in the egg until combined. Finally, whisk in the buttermilk. Pour the wet ingredients into the dry ingredients and whisk until combined. Avoid over-mixing.",
 "Pour batter into prepared baking pan. Bake for 20 minutes or until golden brown on top and the center is cooked through. Use a toothpick to test. Edges should be crispy at this point. Allow to slightly cool before slicing and serving. Serve cornbread with butter, honey, jam, or whatever you like.",
@@ -49,6 +53,11 @@ class TestRecipe(unittest.TestCase):
         self.cornbread1 = Recipe("Sally's Cornbread", "https://sallysbakingaddiction.com/my-favorite-cornbread/", ingredients1, self.steps1)
         self.cornbread2 = Recipe("Supermoist Cornbread", "https://www.lecremedelacrumb.com/best-super-moist-cornbread/", ingredients2, self.steps2)
         self.cornbread3 = Recipe("Golden Sweet Cornbread", "https://www.allrecipes.com/recipe/17891/golden-sweet-cornbread/", ingredients3, self.steps3)
+
+        self.recipe1 = Recipe("Test recipe 1", "x", ingredients4, ["fake step"])
+        self.recipe2 = Recipe("Test recipe 2", "x", ingredients5, ["fake step"])
+
+
 
 
     def test_recipe_init(self):
@@ -79,3 +88,7 @@ class TestRecipe(unittest.TestCase):
         self.assertEqual(self.cornbread1._format_instructions(), ans1)
         self.assertEqual(self.cornbread2._format_instructions(), ans2)
 
+
+    def test_compare_recipe(self):
+        ans1 = [("1 egg", "3 eggs", ("-2", "")), ("3/4 cup white sugar", "100 g white sugar", ("0.25", "g")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml")), ("0 g brown sugar", "50 g brown sugar", ("-50", "g"))]
+        self.assertEqual(self.recipe1.compare_recipe(self.recipe2), ans1)

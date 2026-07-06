@@ -104,7 +104,7 @@ class Recipe:
     def is_empty(self) -> bool:
         return len(self._ingredients) == 0
 
-    def compare_recipe(self, other) -> str: # TODO Gets stuck in a loop, or just takes a long time, need to DEBUG
+    def compare_recipe(self, other) -> list:
         """
         compares this recipe with another recipe by finding all same or similar
         ingredients and returning a string with the ingredients for each recipe
@@ -143,61 +143,84 @@ class Recipe:
             else:
                 # if no similar ingredient found, add with None, output will
                 # show no comparable ingredient
-                ingredientPairs.append((thisIngredient, None))
+                duplicateIng = thisIngredient.clone()
+                duplicateIng.empty_ingredient()
+                ingredientPairs.append((thisIngredient, duplicateIng))
 
         # if either recipe has remaining ingredients add to list
 
         for ingredient in thisRecipe:
-            ingredientPairs.append((ingredient, None))
+            duplicateIng = ingredient.clone()
+            duplicateIng.empty_ingredient()
+            ingredientPairs.append((ingredient, duplicateIng))
 
 
         for ingredient in otherRecipe:
-            ingredientPairs.append((None, ingredient))
+            duplicateIng = ingredient
+            duplicateIng.empty_ingredient()
+            ingredientPairs.append((duplicateIng, ingredient))
 
         # format output
-        resultStr = ''
+        result = []
 
         for pair in ingredientPairs:
-            resultStr += "\n"
-            if pair[0] is None:
-                resultStr += f"\n\t\t\t{str(pair[1])}"
-            elif pair[1] is None:
-                resultStr += f"{str(pair[0])}"
-            else:
-                # need ingredient method that just normalizes both ingredients
-                #  to same measurement than returns the difference +/-
-                resultStr += (f"{str(pair[0])}\t\t\t{str(pair[1])}\t\t"
-                               f"{pair[0].difference(pair[1])}")
-        return resultStr
+            result.append((pair[0], pair[1], pair[0].difference(pair[1])))
 
+        return result
 
-sally = Recipe("Sally's Cornbread", "x", ['1 cup (120g) fine cornmeal',
-                                          '1 cup (125g) all-purpose flour (spooned & leveled)',
-                                          '1 teaspoon baking powder', '1/2 teaspoon baking soda',
-                                          '1/8 teaspoon salt',
-                                          '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled',
-                                          '1/3 cup (67g) packed light or dark brown sugar',
-                                          '2 Tablespoons (30ml) honey',
-                                          '1 large egg, at room temperature',
-                                          '1 cup (240ml) buttermilk, at room temperature*'
-                                          ],
-               ["Preheat oven to 400°F (204°C). Grease and lightly flour a 9-inch square baking pan. Set aside.",
-               "Whisk the cornmeal, flour, baking powder, baking soda, and salt together in a large bowl. Set aside. In a medium bowl, whisk the melted butter, brown sugar, and honey together until completely smooth and thick. Then, whisk in the egg until combined. Finally, whisk in the buttermilk. Pour the wet ingredients into the dry ingredients and whisk until combined. Avoid over-mixing.",
-               "Pour batter into prepared baking pan. Bake for 20 minutes or until golden brown on top and the center is cooked through. Use a toothpick to test. Edges should be crispy at this point. Allow to slightly cool before slicing and serving. Serve cornbread with butter, honey, jam, or whatever you like.",
-               "Wrap leftovers up tightly and store at room temperature for up to 1 week."]
-               )
-moist = Recipe("Moise Cornbread", "y",['2 ½ cups flour', '1 cup cornmeal', '1 cup sugar',
-                        '1 ½ tablespoons baking powder', '1 teaspoon salt',
-                        '½ cup (8 tablespoons) butter (melted)', '½ cup oil',
-                        '1 ¼ cups milk', '3 large eggs',
-                        'honey and extra butter for serving (optional)'],
-               ["Preheat oven to 350 degrees and grease a 9x13 inch pan.",
-                "In a large bowl whisk together flour, cornmeal, sugar, baking powder, and salt.",
-                "In a medium bowl mix together butter, oil, milk, and eggs.",
-                "Add wet ingredients to dry ingredients and mix until combined.",
-                "Transfer batter to your prepared pan. Bake for 35-45 minutes until golden and a toothpick inserted in the middle comes out clean or with only a few crumbs (no wet batter).",
-                "Allow to cool for 15-20 minutes in the pan before cutting into squares and serving. Serve with butter and honey if desired. Store in airtight container at room temperature up to 3 days or in the fridge for 1 week."
-                ]
-               )
+    def _compare_helper(self, first_ing: list, second_ing: list) -> list:
+        """
+        takes two list of ingredients and returns a list of tuples that
+        contians a tuple of each ingredient with the same ingredient from
+        the other list. If there is no matching ingredient, the tuple will
+        contain that ingredient and none
 
-print(sally.compare_recipe(moist))
+         Precondition:
+            first_recipe and second_recipe are a list of ingredients and
+            measurements as a string
+            example: 3/4 cup of sugar
+
+        Returns:
+            list of pair ingredient tuples
+            example: [("3/4 cup white sugar", "100 g white sugar")]
+
+            Example:
+                first_ing: ["1 egg", "3/4 cup white sugar", "25 mL olive oil"]
+                second_ing: ["3 eggs", "100 g white sugar", "50 g brown sugar"]
+                return value:
+                    [("1 egg", "3 eggs"),
+                    ("3/4 cup white sugar", "100 g white sugar"),
+                    ("25 mL olive oil", None), (None, "50 g brown sugar")]
+        """
+        pass
+
+# sally = Recipe("Sally's Cornbread", "x", ['1 cup (120g) fine cornmeal',
+#                                           '1 cup (125g) all-purpose flour (spooned & leveled)',
+#                                           '1 teaspoon baking powder', '1/2 teaspoon baking soda',
+#                                           '1/8 teaspoon salt',
+#                                           '1/2 cup (8 Tbsp; 113g) unsalted butter, melted and slightly cooled',
+#                                           '1/3 cup (67g) packed light or dark brown sugar',
+#                                           '2 Tablespoons (30ml) honey',
+#                                           '1 large egg, at room temperature',
+#                                           '1 cup (240ml) buttermilk, at room temperature*'
+#                                           ],
+#                ["Preheat oven to 400°F (204°C). Grease and lightly flour a 9-inch square baking pan. Set aside.",
+#                "Whisk the cornmeal, flour, baking powder, baking soda, and salt together in a large bowl. Set aside. In a medium bowl, whisk the melted butter, brown sugar, and honey together until completely smooth and thick. Then, whisk in the egg until combined. Finally, whisk in the buttermilk. Pour the wet ingredients into the dry ingredients and whisk until combined. Avoid over-mixing.",
+#                "Pour batter into prepared baking pan. Bake for 20 minutes or until golden brown on top and the center is cooked through. Use a toothpick to test. Edges should be crispy at this point. Allow to slightly cool before slicing and serving. Serve cornbread with butter, honey, jam, or whatever you like.",
+#                "Wrap leftovers up tightly and store at room temperature for up to 1 week."]
+#                )
+# moist = Recipe("Moise Cornbread", "y",['2 ½ cups flour', '1 cup cornmeal', '1 cup sugar',
+#                         '1 ½ tablespoons baking powder', '1 teaspoon salt',
+#                         '½ cup (8 tablespoons) butter (melted)', '½ cup oil',
+#                         '1 ¼ cups milk', '3 large eggs',
+#                         'honey and extra butter for serving (optional)'],
+#                ["Preheat oven to 350 degrees and grease a 9x13 inch pan.",
+#                 "In a large bowl whisk together flour, cornmeal, sugar, baking powder, and salt.",
+#                 "In a medium bowl mix together butter, oil, milk, and eggs.",
+#                 "Add wet ingredients to dry ingredients and mix until combined.",
+#                 "Transfer batter to your prepared pan. Bake for 35-45 minutes until golden and a toothpick inserted in the middle comes out clean or with only a few crumbs (no wet batter).",
+#                 "Allow to cool for 15-20 minutes in the pan before cutting into squares and serving. Serve with butter and honey if desired. Store in airtight container at room temperature up to 3 days or in the fridge for 1 week."
+#                 ]
+#                )
+#
+# print(sally.compare_recipe(moist))
