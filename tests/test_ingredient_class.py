@@ -273,3 +273,70 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.flour.difference(self.metricCupFlour, False), ('0', 'g'))
         self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour, False), ('-187.5', 'g'))
 
+
+    def test_clone(self):
+        cloneFlour = self.flour.clone()
+        self.assertEqual(self.flour._name, cloneFlour._name)
+        self.assertEqual(self.flour._kitchenAmount, cloneFlour._kitchenAmount)
+        self.assertEqual(self.flour._kitchenMeasure, cloneFlour._kitchenMeasure)
+        self.assertEqual(self.flour._metricAmount, cloneFlour._metricAmount)
+        self.assertEqual(self.flour._metricMeasure, cloneFlour._metricMeasure)
+        self.assertEqual(self.flour._density, cloneFlour._density)
+        self.assertEqual(self.flour._state, cloneFlour._state)
+        self.assertEqual(self.flour._keywords, cloneFlour._keywords)
+        self.assertNotEqual(self.flour, cloneFlour)
+
+        clonePotatoes = self.sixPotatoes.clone()
+        self.assertEqual(self.sixPotatoes._name, clonePotatoes._name)
+        self.assertEqual(self.sixPotatoes._kitchenAmount, clonePotatoes._kitchenAmount)
+        self.assertEqual(self.sixPotatoes._kitchenMeasure,
+                         clonePotatoes._kitchenMeasure)
+        self.assertEqual(self.sixPotatoes._metricAmount, clonePotatoes._metricAmount)
+        self.assertEqual(self.sixPotatoes._metricMeasure, clonePotatoes._metricMeasure)
+        self.assertEqual(self.sixPotatoes._density, clonePotatoes._density)
+        self.assertEqual(self.sixPotatoes._state, clonePotatoes._state)
+        self.assertEqual(self.sixPotatoes._keywords, clonePotatoes._keywords)
+        self.assertNotEqual(self.sixPotatoes, clonePotatoes)
+
+        cloneVegOil = self.vegOil.clone()
+        self.assertEqual(self.vegOil._name, cloneVegOil._name)
+        self.assertEqual(self.vegOil._kitchenAmount,
+                         cloneVegOil._kitchenAmount)
+        self.assertEqual(self.vegOil._kitchenMeasure,
+                         cloneVegOil._kitchenMeasure)
+        self.assertEqual(self.vegOil._metricAmount,
+                         cloneVegOil._metricAmount)
+        self.assertEqual(self.vegOil._metricMeasure,
+                         cloneVegOil._metricMeasure)
+        self.assertEqual(self.vegOil._density, cloneVegOil._density)
+        self.assertEqual(self.vegOil._state, cloneVegOil._state)
+        self.assertEqual(self.vegOil._keywords, cloneVegOil._keywords)
+        self.assertNotEqual(self.vegOil, cloneVegOil)
+
+
+    def test_empty_ingredient(self):
+        cloneFlour = self.flour.clone()
+        cloneFlour.empty_ingredient()
+        self.assertEqual(cloneFlour.kitchen_amount(), 0)
+        self.assertEqual(cloneFlour.metric_amount(), 0)
+        self.assertEqual(self.flour._name, cloneFlour._name)
+        self.assertEqual(self.flour._kitchenMeasure,
+                         cloneFlour._kitchenMeasure)
+        self.assertEqual(self.flour._metricMeasure, cloneFlour._metricMeasure)
+        self.assertEqual(self.flour._density, cloneFlour._density)
+        self.assertEqual(self.flour._state, cloneFlour._state)
+        self.assertEqual(self.flour._keywords, cloneFlour._keywords)
+
+        cloneVegOil = self.vegOil.clone()
+        cloneVegOil.empty_ingredient()
+        self.assertEqual(cloneVegOil.kitchen_amount(), 0)
+        self.assertEqual(cloneVegOil.metric_amount(), 0)
+        self.assertEqual(self.vegOil._name, cloneVegOil._name)
+        self.assertEqual(self.vegOil._kitchenMeasure,
+                         cloneVegOil._kitchenMeasure)
+        self.assertEqual(self.vegOil._metricMeasure,
+                         cloneVegOil._metricMeasure)
+        self.assertEqual(self.vegOil._density, cloneVegOil._density)
+        self.assertEqual(self.vegOil._state, cloneVegOil._state)
+        self.assertEqual(self.vegOil._keywords, cloneVegOil._keywords)
+        self.assertNotEqual(self.vegOil, cloneVegOil)

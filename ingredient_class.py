@@ -180,6 +180,16 @@ class Ingredient:
         if measure == 'T' or measure == 'T.':
             return 'tablespoon'
         measure = measure.lower()
+        if measure[-6:] == "liters" or measure[-5:] == "liter":
+            if measure == "milliliter" or measure == "milliliters":
+                return "ml"
+            elif measure == "liter" or measure == "liters":
+                return 'l'
+        elif measure[-5:] == "grams" or measure[-4:] == "gram":
+            if measure == "gram" or measure == "grams":
+                return "g"
+            elif measure == "kilogram" or measure == "kilogram":
+                return 'kg'
 
         POSSIBLE_VALUES = ('cup', 'tablespoon', 'tbsp', 'tb', 't', 'teaspoon',
                            'tsp','ml', 'l', 'g', 'kg')
@@ -640,3 +650,20 @@ class Ingredient:
             return self._kitchenAmount * 16
         else:
             raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, or teaspoon, but was {self._kitchenMeasure}")
+
+    def clone(self) -> Ingredient:
+        """
+        creates a copy of the ingredient with all the same attributes
+        returns a copy of tnis ingredient
+        """
+        cloneIng = Ingredient(self._name, self.kitchen_amount(),
+                              self.kitchen_measure(), self._state)
+        return cloneIng
+
+    def empty_ingredient(self):
+        """
+        sets all measurements to 0
+        Used for comparison
+        """
+        self._kitchenAmount = self._convert_to_fraction(0)
+        self._metricAmount = self._convert_to_fraction(0)
