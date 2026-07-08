@@ -28,6 +28,7 @@ class TestRecipe(unittest.TestCase):
 
         ingredients4 = ["1 egg", "3/4 cup white sugar", "25 ml olive oil"]
         ingredients5 = ["3 eggs", "100 g white sugar", "50 g brown sugar"]
+        empty_ingredients = []
 
         self.steps1 = ["Preheat oven to 400°F (204°C). Grease and lightly flour a 9-inch square baking pan. Set aside.",
 "Whisk the cornmeal, flour, baking powder, baking soda, and salt together in a large bowl. Set aside. In a medium bowl, whisk the melted butter, brown sugar, and honey together until completely smooth and thick. Then, whisk in the egg until combined. Finally, whisk in the buttermilk. Pour the wet ingredients into the dry ingredients and whisk until combined. Avoid over-mixing.",
@@ -56,8 +57,7 @@ class TestRecipe(unittest.TestCase):
 
         self.recipe1 = Recipe("Test recipe 1", "x", ingredients4, ["fake step"])
         self.recipe2 = Recipe("Test recipe 2", "x", ingredients5, ["fake step"])
-
-
+        self.empty_recipe = Recipe("Empty recipe", "x", empty_ingredients, ["empty"])
 
 
     def test_recipe_init(self):
@@ -91,4 +91,15 @@ class TestRecipe(unittest.TestCase):
 
     def test_compare_recipe(self):
         ans1 = [("1 egg", "3 eggs", ("-2", "")), ("3/4 cup white sugar", "100 g white sugar", ("0.25", "cup")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml")), ("0 g brown sugar", "50 g brown sugar", ("-50", "g"))]
+        # ans2 = [("1 egg", "0 egg", ("1", "")), ("3/4 cup white sugar", "0 cup white sugar", ("3/4", "cup")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml"))]
+
         self.assertEqual(self.recipe1.compare_recipe(self.recipe2), ans1)
+
+
+        with self.assertRaises(Exception) as context:
+            self.recipe1.compare_recipe(self.empty_recipe)
+
+        self.assertEqual(
+            str(context.exception),
+            "self and other must contain a list of ingredients"
+        )
