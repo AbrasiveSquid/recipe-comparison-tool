@@ -126,50 +126,20 @@ class Recipe:
             raise Exception("self and other must contain a list of "
                             "ingredients")
 
-        ingredientPairs = []
-
+        # match ingredients as a list of tuples
         thisRecipe = self._ingredients
         thisRecipe.reverse() # reverse more efficient to pop from end in loop
         otherRecipe = other._ingredients
+        ingredientPairs = self._compare_helper(thisRecipe, otherRecipe)
 
-
-        while len(thisRecipe) and len(otherRecipe):
-            thisIngredient = thisRecipe.pop()
-
-            for i in range(len(otherRecipe)):
-                if thisIngredient.compare_ingredient(otherRecipe[i]):
-                    ingredientPairs.append((thisIngredient, otherRecipe.pop(i)))
-                    break
-            else:
-                # if no similar ingredient found, add with None, output will
-                # show no comparable ingredient
-                duplicateIng = thisIngredient.clone()
-                duplicateIng.empty_ingredient()
-                ingredientPairs.append((thisIngredient, duplicateIng))
-
-        # if either recipe has remaining ingredients add to list
-
-        for ingredient in thisRecipe:
-            duplicateIng = ingredient.clone()
-            duplicateIng.empty_ingredient()
-            ingredientPairs.append((ingredient, duplicateIng))
-
-
-        for ingredient in otherRecipe:
-            duplicateIng = ingredient.clone()
-            duplicateIng.empty_ingredient()
-            ingredientPairs.append((duplicateIng, ingredient))
-
-        # format output
+        # create list of tuples with ingredient in pos 0 and 1, difference in 2
         result = []
-
         for pair in ingredientPairs:
             result.append((pair[0].__str__(), pair[1].__str__(),
                            pair[0].difference(pair[1])))
-
         return result
 
-    def _compare_helper(self, first_ing: list, second_ing: list) -> list:
+    def _compare_helper(self, firstRecipe: list, secondRecipe: list) -> list:
         """
         takes two list of ingredients and returns a list of tuples that
         contians a tuple of each ingredient with the same ingredient from
@@ -177,7 +147,7 @@ class Recipe:
         contain that ingredient and none
 
          Precondition:
-            first_recipe and second_recipe are a list of ingredients and
+            firstRecipe and secondRecipe are a list of ingredients and
             measurements as a string
             example: 3/4 cup of sugar
 
@@ -186,14 +156,43 @@ class Recipe:
             example: [("3/4 cup white sugar", "100 g white sugar")]
 
             Example:
-                first_ing: ["1 egg", "3/4 cup white sugar", "25 mL olive oil"]
+                first_ing: ["1 egg", "3/4 cup white sugar", "25 ml olive oil"]
                 second_ing: ["3 eggs", "100 g white sugar", "50 g brown sugar"]
                 return value:
                     [("1 egg", "3 eggs"),
                     ("3/4 cup white sugar", "100 g white sugar"),
-                    ("25 mL olive oil", None), (None, "50 g brown sugar")]
+                    ("25 ml olive oil", "0 ml olive oil"),
+                    ("0 g brown sugar", "50 g brown sugar")]
         """
-        pass
+        ingredientPairs = []
+
+        while len(firstRecipe) and len(secondRecipe):
+            thisIngredient = firstRecipe.pop()
+
+            for i in range(len(secondRecipe)):
+                if thisIngredient.compare_ingredient(secondRecipe[i]):
+                    ingredientPairs.append(
+                        (thisIngredient, secondRecipe.pop(i)))
+                    break
+            else:
+                # if no matching ingredient, append an emptied clone ingredient
+                duplicateIng = thisIngredient.clone()
+                duplicateIng.empty_ingredient()
+                ingredientPairs.append((thisIngredient, duplicateIng))
+
+        # add remaining ingredients with an emptied clone ingredient
+        for ingredient in firstRecipe:
+            duplicateIng = ingredient.clone()
+            duplicateIng.empty_ingredient()
+            ingredientPairs.append((ingredient, duplicateIng))
+
+
+        for ingredient in secondRecipe:
+            duplicateIng = ingredient.clone()
+            duplicateIng.empty_ingredient()
+            ingredientPairs.append((duplicateIng, ingredient))
+
+        return ingredientPairs
 
 # sally = Recipe("Sally's Cornbread", "x", ['1 cup (120g) fine cornmeal',
 #                                           '1 cup (125g) all-purpose flour (spooned & leveled)',
