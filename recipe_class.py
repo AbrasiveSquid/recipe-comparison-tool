@@ -43,7 +43,8 @@ class Recipe:
                 self._ingredients.append(Ingredient(ingredientName, qty, unit))
             elif parsed.name:
                 for optionalIngredient in parsed.name: # no qty available
-                    self._optionalIngredients.append(Ingredient(optionalIngredient.text, 0, 0))
+                    self._optionalIngredients.append(
+                        Ingredient(optionalIngredient.text, 0, 0))
             else:
                 raise ValueError(f"No quantity found: {ingredient}")
 

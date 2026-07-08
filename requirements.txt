@@ -35,3 +35,5 @@ w3lib==2.3.1
 webencodings==0.5.1
 pytest==9.0.2
 inflect>=7.0.0
+cloudscraper==1.2.71
+requests-toolbelt==1.0.0

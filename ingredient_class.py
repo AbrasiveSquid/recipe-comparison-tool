@@ -84,6 +84,13 @@ class Ingredient:
         # constants
         KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
         METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
+        OUTLIER_MEAUSRES = ("gill", "pint", "pt", "quart", "qt",
+                            "gallon", "gal", "shot", "oz", "ounce", "lb",
+                            "pound", "dash", "pinch", "drop", "smidgen",
+                            "fl oz", "fluid ounce")
+
+        if measure in OUTLIER_MEAUSRES:
+            measure, amount = self._convert_from_outlier(measure, amount)
 
         measure = self._verify_measure(measure)
 
@@ -113,6 +120,40 @@ class Ingredient:
             kitchenAmount, kitchenMeasure = self._convert_to_kitchen()
             self._kitchenAmount = self._convert_to_fraction(kitchenAmount)
             self._kitchenMeasure = kitchenMeasure
+
+    def _convert_from_outlier(self, measure:str,
+                              amount:fractions.Fraction) -> tuple:
+        """
+        converts an outlier measurement ("gill", "pint", "pt", "quart", "qt",
+        "gallon", "gal", "shot", "oz", "ounce", "lb", "pound", "dash", "pinch",
+         "drop", "smidgen", "fl oz", "fluid ounce") into an equivalent kitchen
+         measurement.
+
+        Returns:
+            tuple that contains a str of the kitch measurement and an amount
+            as a fractions.Fraction
+        """
+        match measure:
+            case "gill":
+                return "cup", 0.5 * amount
+            case "pint" | "pt":
+                return "cup", 2 * amount
+            case "quart" | "qt":
+                return "cup", 4 * amount
+            case "gallon" | "gal":
+                return "cup", 16 * amount
+            case "shot":
+                return "tablespoon", 3 * amount
+            case "fl oz" | "fluid ounce":
+                return "tablespoon", 2 * amount
+            case "lb" | "pound":
+                return "g", 453.59 * amount
+            case "dash":
+                return "teaspoon", amount/8
+            case "pinch":
+                return "teaspoon", amount/16
+            case "smidgen" | "drop":
+                return "teaspoon", amount/32
 
 
     def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:
@@ -293,6 +334,8 @@ class Ingredient:
                     self._density = ingDetails['density']
                     self._state = ingDetails['state']
                     return
+            self._density = 240
+            self._state = "liquid"
             return
 
     def _clean_name(self, name:str) -> str:
@@ -340,13 +383,25 @@ class Ingredient:
         """
         # constant
         FILLER_WORDS = ('all', 'purpose', 'extra', 'large', 'small', 'medium',
-                        'fine', 'coarse', 'thick', 'thin', 'melted',
-                        'softened', 'chilled', 'cold', 'room', 'temperature',
-                        'sifted', 'packed', 'leveled', 'spooned', 'grated',
-                        'minced', 'chopped', 'diced', 'sliced', 'crushed',
-                        'beaten', 'whisked', 'melted', 'organic', 'natural',
-                        'virgin', 'unsalted', 'salted', 'sweetened',
-                        'unsweetened', 'light', 'dark')
+                        'fine', 'coarse', 'thick', 'thin', 'softened',
+                        'chilled', 'cold', 'room', 'temperature', 'sifted',
+                        'packed', 'leveled', 'spooned', 'grated', 'minced',
+                        'chopped', 'diced', 'sliced', 'crushed', 'beaten',
+                        'whisked', 'melted', 'organic', 'natural', 'virgin',
+                        'unsalted', 'salted', 'sweetened', 'unsweetened',
+                        'light', 'dark', 'filler', 'peeled', 'cored', 'seeded',
+                        'pitted', 'halved', 'quartered', 'mashed', 'pureed',
+                        'blanched', 'toasted', 'roasted',
+                        'baked', 'boiled', 'steamed', 'smoked', 'cured',
+                        'aged', 'ground', 'milled', 'cracked', 'shredded',
+                        'torn', 'rinsed', 'drained', 'thawed', 'cubed',
+                        'fresh', 'dried', 'raw', 'frozen', 'ripe', 'unripe',
+                        'canned', 'tinned', 'bottled', 'jarred', 'homemade',
+                        'pure', 'concentrated', 'clarified', 'evaporated',
+                        'condensed', 'powdered', 'granulated', 'warm', 'hot',
+                        'boiling', 'ice', 'iced', 'jumbo', 'mini', 'whole',
+                        'mild', 'spicy', 'optional', 'taste', 'garnish',
+                        'divided', 'plus', 'more', 'about')
 
         words = self._name.split(' ')
         for word in words:
@@ -465,6 +520,10 @@ class Ingredient:
         if self._kitchenMeasure not in KITCHEN_MEASURES:
             raise ValueError("self._measure must be 'cup' or 'tablespoon' or"
                              f"'teaspoon', but is {self._measure}")
+        if self._density is None:
+            return ValueError(f"Ingredient: {self._name} does not have a "
+                              f"density and converion to metric is not "
+                              f"possible")
 
         if self._kitchenMeasure == 'cup':
             conversionFactor = 1
