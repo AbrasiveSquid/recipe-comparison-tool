@@ -156,7 +156,7 @@ class Recipe:
 
 
         for ingredient in otherRecipe:
-            duplicateIng = ingredient
+            duplicateIng = ingredient.clone()
             duplicateIng.empty_ingredient()
             ingredientPairs.append((duplicateIng, ingredient))
 
@@ -164,7 +164,8 @@ class Recipe:
         result = []
 
         for pair in ingredientPairs:
-            result.append((pair[0], pair[1], pair[0].difference(pair[1])))
+            result.append((pair[0].__str__(), pair[1].__str__(),
+                           pair[0].difference(pair[1])))
 
         return result
 
@@ -224,3 +225,10 @@ class Recipe:
 #                )
 #
 # print(sally.compare_recipe(moist))
+
+
+# ingredients4 = ["1 egg", "3/4 cup white sugar", "25 ml olive oil"]
+# ingredients5 = ["3 eggs", "100 g white sugar", "50 g brown sugar"]
+# recipe1 = Recipe("Test recipe 1", "x", ingredients4, ["fake step"])
+# recipe2 = Recipe("Test recipe 2", "x", ingredients5, ["fake step"])
+# print(recipe1.compare_recipe(recipe2))

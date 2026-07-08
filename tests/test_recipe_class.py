@@ -90,5 +90,5 @@ class TestRecipe(unittest.TestCase):
 
 
     def test_compare_recipe(self):
-        ans1 = [("1 egg", "3 eggs", ("-2", "")), ("3/4 cup white sugar", "100 g white sugar", ("0.25", "g")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml")), ("0 g brown sugar", "50 g brown sugar", ("-50", "g"))]
+        ans1 = [("1 egg", "3 eggs", ("-2", "")), ("3/4 cup white sugar", "100 g white sugar", ("0.25", "cup")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml")), ("0 g brown sugar", "50 g brown sugar", ("-50", "g"))]
         self.assertEqual(self.recipe1.compare_recipe(self.recipe2), ans1)

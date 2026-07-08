@@ -541,12 +541,13 @@ class Ingredient:
         returns print friendly str representation of an ingredient
         """
         if self._state == 'thing': # dimensionless
-            if self._kitchenAmount == 0:
-                return f"{self._name}"
-            else:
-                return f"{self._kitchenAmount} {self._name}"
+            return f"{self._kitchenAmount} {self._name}"
+        elif self._defaultMeasure == "kitchen":
+            return (f"{self.kitchen_amount()} {self.kitchen_measure()} "
+                    f"{self._name}")
         else:
-            return f"{self._kitchenAmount} {self._kitchenMeasure} {self._name}"
+            return (f"{self.metric_amount()} {self.metric_measure()} "
+                    f"{self._name}")
 
     def compare_ingredient(self, other) -> bool:
         """
@@ -713,8 +714,15 @@ class Ingredient:
         creates a copy of the ingredient with all the same attributes
         returns a copy of tnis ingredient
         """
-        cloneIng = Ingredient(self._name, self.kitchen_amount(),
+        if self._defaultMeasure == "kitchen":
+            cloneIng = Ingredient(self._name, self.kitchen_amount(),
                               self.kitchen_measure(), self._state)
+        elif self._defaultMeasure == "metric":
+            cloneIng = Ingredient(self._name, self.metric_amount(),
+                                  self.metric_measure(), self._state)
+        else:
+            cloneIng = Ingredient(self._name, self.kitchen_amount(),
+                                  self.kitchen_measure(), self._state)
         return cloneIng
 
     def empty_ingredient(self):

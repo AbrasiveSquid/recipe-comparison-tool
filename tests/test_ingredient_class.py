@@ -284,6 +284,8 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.flour._density, cloneFlour._density)
         self.assertEqual(self.flour._state, cloneFlour._state)
         self.assertEqual(self.flour._keywords, cloneFlour._keywords)
+        self.assertEqual(self.flour._defaultMeasure, cloneFlour._defaultMeasure)
+        self.assertEqual(cloneFlour._defaultMeasure, "kitchen")
         self.assertNotEqual(self.flour, cloneFlour)
 
         clonePotatoes = self.sixPotatoes.clone()
@@ -296,6 +298,8 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.sixPotatoes._density, clonePotatoes._density)
         self.assertEqual(self.sixPotatoes._state, clonePotatoes._state)
         self.assertEqual(self.sixPotatoes._keywords, clonePotatoes._keywords)
+        self.assertEqual(self.sixPotatoes._defaultMeasure, clonePotatoes._defaultMeasure)
+        self.assertEqual(clonePotatoes._defaultMeasure, None)
         self.assertNotEqual(self.sixPotatoes, clonePotatoes)
 
         cloneVegOil = self.vegOil.clone()
@@ -311,8 +315,12 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.vegOil._density, cloneVegOil._density)
         self.assertEqual(self.vegOil._state, cloneVegOil._state)
         self.assertEqual(self.vegOil._keywords, cloneVegOil._keywords)
+        self.assertEqual(self.vegOil._defaultMeasure, cloneVegOil._defaultMeasure)
         self.assertNotEqual(self.vegOil, cloneVegOil)
 
+        cloneMetricVegOil = self.metricCupVegOil.clone()
+        self.assertEqual(self.vegOil._defaultMeasure, cloneVegOil._defaultMeasure)
+        self.assertEqual(cloneMetricVegOil._defaultMeasure, "metric")
 
     def test_empty_ingredient(self):
         cloneFlour = self.flour.clone()
