@@ -624,7 +624,7 @@ class Ingredient:
         formats the output for a metric amount into a readable string
         converts odd fractions to decimal
         """
-        return f"{round(float(self._metricAmount), 2):g}"
+        return f"{round(float(self._metricAmount), 2):  g}"
 
     def kitchen_amount_str(self) -> str:
         return f"{round(float(self._kitchenAmount), 2):g}"
