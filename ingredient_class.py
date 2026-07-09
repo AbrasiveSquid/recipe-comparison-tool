@@ -91,6 +91,7 @@ class Ingredient:
 
         if measure in OUTLIER_MEAUSRES:
             measure, amount = self._convert_from_outlier(measure, amount)
+            amount = self._convert_to_fraction(amount)
 
         measure = self._verify_measure(measure)
 
@@ -126,13 +127,15 @@ class Ingredient:
         """
         converts an outlier measurement ("gill", "pint", "pt", "quart", "qt",
         "gallon", "gal", "shot", "oz", "ounce", "lb", "pound", "dash", "pinch",
-         "drop", "smidgen", "fl oz", "fluid ounce") into an equivalent kitchen
-         measurement.
+         "drop", "smidgen", "fl oz", "fluid ounce", "oz, "ounce) into an
+         equivalent kitchen measurement.
 
         Returns:
             tuple that contains a str of the kitch measurement and an amount
             as a fractions.Fraction
         """
+        if not amount:
+            amount = 1
         match measure:
             case "gill":
                 return "cup", 0.5 * amount
@@ -154,6 +157,14 @@ class Ingredient:
                 return "teaspoon", amount/16
             case "smidgen" | "drop":
                 return "teaspoon", amount/32
+            case "oz" | "ounce":
+                if self._state == "solid":
+                    return "g", amount * 28.34952
+                elif self._state == "liquid":
+                    return "tablespoon", 2 * amount
+                else:
+                    raise ValueError(f"state: {self._state} not compatible "
+                                     f"with ounce measure")
 
 
     def _verify_amount(self, amount: str | int | float) -> fractions.Fraction:

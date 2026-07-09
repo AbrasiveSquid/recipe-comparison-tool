@@ -8,17 +8,18 @@ def main():
     two Recipe objects, then compares them
     """
     # for debugging
-    userInput1 = "https://www.allrecipes.com/recipe/40403/best-of-the-best-blueberry-muffins/"
-    userInput2 = "https://www.epicurious.com/recipes/food/views/blueberry-muffin-recipe"
+    # userInput1 = "https://www.allrecipes.com/recipe/40403/best-of-the-best-blueberry-muffins/"
+    # userInput2 = "https://www.epicurious.com/recipes/food/views/blueberry-muffin-recipe"
+    # userInput2 = "https://www.foodnetwork.com/recipes/alton-brown/blueberry-muffins-recipe-1941521"
     while True:
-        # userInput1 = input("Enter a url for the first recipe: ")
+        userInput1 = input("Enter a url for the first recipe: ")
         if is_valid_url(userInput1):
             break
         print(f"{userInput1} is not a valid url. Ensure it includes the full "
               f"url including http:// or https://")
 
     while True:
-        # userInput2 = input("Enter a url for the second recipe: ")
+        userInput2 = input("Enter a url for the second recipe: ")
         if is_valid_url(userInput2):
             break
         print(f"{userInput2} is not a valid url. Ensure it includes the full "

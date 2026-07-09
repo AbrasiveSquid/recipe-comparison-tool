@@ -39,7 +39,10 @@ class Recipe:
 
                 qty = item.quantity
                 unit = str(item.unit)
-                ingredientName = parsed.name[0].text
+                # ingredientName = parsed.name[0].text
+                best_name_token = max(parsed.name,
+                                      key=lambda x: x.confidence)
+                ingredientName = best_name_token.text
                 self._ingredients.append(Ingredient(ingredientName, qty, unit))
             elif parsed.name:
                 for optionalIngredient in parsed.name: # no qty available
