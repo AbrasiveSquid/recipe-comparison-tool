@@ -613,11 +613,21 @@ class Ingredient:
         if self._state == 'thing': # dimensionless
             return f"{self._kitchenAmount} {self._name}"
         elif self._defaultMeasure == "kitchen":
-            return (f"{self.kitchen_amount()} {self.kitchen_measure()} "
+            return (f"{self.kitchen_amount_str()} {self.kitchen_measure()} "
                     f"{self._name}")
         else:
-            return (f"{self.metric_amount()} {self.metric_measure()} "
+            return (f"{self.metric_amount_str()} {self.metric_measure()} "
                     f"{self._name}")
+
+    def metric_amount_str(self) -> str:
+        """
+        formats the output for a metric amount into a readable string
+        converts odd fractions to decimal
+        """
+        return f"{round(float(self._metricAmount), 2):g}"
+
+    def kitchen_amount_str(self) -> str:
+        return f"{round(float(self._kitchenAmount), 2):g}"
 
     def compare_ingredient(self, other) -> bool:
         """
@@ -763,7 +773,9 @@ class Ingredient:
         elif self._kitchenMeasure == "cup":
             return self._kitchenAmount * 48
         else:
-            raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, or teaspoon, but was {self._kitchenMeasure}")
+            raise ValueError(f"self._kitchenMeasure must be a cup, "
+                             f"tablespoon, or teaspoon, but was "
+                             f"{self._kitchenMeasure}")
 
 
     def _convert_to_tablespoon(self) -> fractions.Fraction:
@@ -777,7 +789,8 @@ class Ingredient:
         elif self._kitchenMeasure == "cup":
             return self._kitchenAmount * 16
         else:
-            raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, or teaspoon, but was {self._kitchenMeasure}")
+            raise ValueError(f"self._kitchenMeasure must be a cup, tablespoon, "
+                             f"or teaspoon, but was {self._kitchenMeasure}")
 
     def clone(self) -> Ingredient:
         """
