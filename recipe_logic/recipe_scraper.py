@@ -17,39 +17,39 @@ def fetch_recipe(url:str) -> dict | None:
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
+    # try:
+    #     response = requests.get(url, headers=headers, timeout=10)
+    #     scraper = scrape_html(html=response.text, org_url=url)
+    #         # print(f"Title: {scraper.title()}")
+    #         # print(f"Total Time: {scraper.total_time()} mins")
+    #         # print(scraper.ingredients())
+    #         # print(scraper.instructions())
+    #         # print("\n\n")
+    #     recipe = {
+    #         "title": scraper.title(),
+    #         "time": f"{scraper.total_time()} minutes",
+    #         "ingredients": scraper.ingredients(),
+    #         # "steps": scraper.instructions(),
+    #         "steps": scraper.instructions_list()
+    #     }
+    #     # recipe["steps"] = clean_steps(recipe["steps"])
+    #     return recipe
+    # except RecipeSchemaNotFound:
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = impersonate_requests.get(url, impersonate="chrome120",
+                                            timeout=15)
+        response.raise_for_status()
         scraper = scrape_html(html=response.text, org_url=url)
-            # print(f"Title: {scraper.title()}")
-            # print(f"Total Time: {scraper.total_time()} mins")
-            # print(scraper.ingredients())
-            # print(scraper.instructions())
-            # print("\n\n")
         recipe = {
             "title": scraper.title(),
             "time": f"{scraper.total_time()} minutes",
             "ingredients": scraper.ingredients(),
-            # "steps": scraper.instructions(),
             "steps": scraper.instructions_list()
         }
-        # recipe["steps"] = clean_steps(recipe["steps"])
         return recipe
-    except RecipeSchemaNotFound:
-        try:
-            response = impersonate_requests.get(url, impersonate="chrome120",
-                                                timeout=15)
-            response.raise_for_status()
-            scraper = scrape_html(html=response.text, org_url=url)
-            recipe = {
-                "title": scraper.title(),
-                "time": f"{scraper.total_time()} minutes",
-                "ingredients": scraper.ingredients(),
-                "steps": scraper.instructions_list()
-            }
-            return recipe
-        except Exception as e:
-            print(f"Scraping error for URL {url}: {e}")
-            return None
+    except Exception as e:
+        print(f"Scraping error for URL {url}: {e}")
+        return None
     except requests.exceptions.Timeout:
         print("The request timed out. The site might be blocking the connection.")
     except Exception as e:

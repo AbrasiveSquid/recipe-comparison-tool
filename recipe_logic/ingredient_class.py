@@ -1,6 +1,7 @@
 import json
 import fractions
 import inflect
+import os
 
 class Ingredient:
     """
@@ -318,8 +319,10 @@ class Ingredient:
         and density in g/cup are values
         # TODO need to figure out how to avoid loading this for each ingredient, maybe should be in recipe?
         """
+        currentDir = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(currentDir, filename)
         try:
-            with open(filename, 'r') as f:
+            with open(filePath, 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
             print(f"{filename} does not exist, cannot use a density table")
@@ -624,7 +627,7 @@ class Ingredient:
         formats the output for a metric amount into a readable string
         converts odd fractions to decimal
         """
-        return f"{round(float(self._metricAmount), 2):  g}"
+        return f"{round(float(self._metricAmount), 2):g}"
 
     def kitchen_amount_str(self) -> str:
         return f"{round(float(self._kitchenAmount), 2):g}"

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+    Welcome to Recipe Tools
+</h1>
+
+<h2>
+    Current Tools
+    <ul>
+        <li>
+            <a href="{{ url_for('comparison') }}">Compare Recipes</a>
+        </li>
+    </ul>
+</h2>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }} - Recipe Comparison</title>
+    {% else %}
+    <title>Welcome to Recipe Comparison Tool</title>
+    {% endif %}
+  </head>
+  <body>
+    <div>
+      Recipe Comparison Tool
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('comparison') }}">Compare Recipes</a>
+    </div>
+    <hr />
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %} {% block content %} {% endblock %}
+  </body>
+</html>
