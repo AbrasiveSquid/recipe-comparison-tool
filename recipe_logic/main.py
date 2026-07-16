@@ -71,5 +71,7 @@ class RecipeComparator:
 # r2 = "https://www.allrecipes.com/recipe/40403/best-of-the-best-blueberry-muffins/"
 # r1 = "https://www.culinaryhill.com/blueberry-muffins/"
 # r2 = "https://www.inspiredtaste.net/18982/our-favorite-easy-blueberry-muffin-recipe/"
+# r1 = "https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"
+# r2 = "https://sallysbakingaddiction.com/chewy-chocolate-chip-cookies/"
 # x = RecipeComparator(r1,r2)
 # print(x.get_comparison())

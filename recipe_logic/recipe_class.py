@@ -35,14 +35,14 @@ class Recipe:
             parsed = parse_ingredient(ingredient)
 
             if parsed.amount:
-                item = parsed.amount[0]
-
+                # get the item with highest confidence
+                item = max(parsed.amount, key=lambda x: x.confidence)
                 qty = item.quantity
                 unit = str(item.unit)
-                # ingredientName = parsed.name[0].text
-                best_name_token = max(parsed.name,
+                # get name with highest confidence
+                bestName = max(parsed.name,
                                       key=lambda x: x.confidence)
-                ingredientName = best_name_token.text
+                ingredientName = bestName.text
                 self._ingredients.append(Ingredient(ingredientName, qty, unit))
             elif parsed.name:
                 for optionalIngredient in parsed.name: # no qty available

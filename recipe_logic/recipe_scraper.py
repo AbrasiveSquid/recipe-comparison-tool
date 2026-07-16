@@ -1,8 +1,6 @@
 import requests
-from cloudscraper import create_scraper
 from recipe_scrapers import scrape_html
-from recipe_scrapers._exceptions import RecipeSchemaNotFound
-# import cloudscraper
+# from recipe_scrapers._exceptions import RecipeSchemaNotFound
 from curl_cffi import requests as impersonate_requests
 
 

@@ -1,6 +1,6 @@
 import unittest
 import fractions
-from ingredient_class import Ingredient
+from ..ingredient_class import Ingredient
 
 
 class TestIngredient(unittest.TestCase):
@@ -174,6 +174,10 @@ class TestIngredient(unittest.TestCase):
 
         flour4 = Ingredient('ALL-PURPOSE_FLOuR', 1, 'cup', 'solid')
         self.assertEqual(flour4.name(), 'all purpose flour')
+
+        bpowder = Ingredient("▢ baking powder", 1, 'cup', 'solid')
+        self.assertEqual(bpowder.name(), 'baking powder')
+
 
     def test_update_density_and_state(self):
         self.assertEqual(self.flour._density, 125)

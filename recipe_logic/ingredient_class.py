@@ -361,7 +361,7 @@ class Ingredient:
             raise TypeError(f"name must be a str but is a {type(name)}")
 
         if name.isalpha():
-            return name.lower()
+            return name.lower().strip()
 
         cleanName = ''
         for char in name:
@@ -369,7 +369,7 @@ class Ingredient:
                 cleanName += char.lower()
             elif char == '-' or char == '_':
                 cleanName += ' '
-        return cleanName
+        return cleanName.strip()
 
     # def to_kitchen_measurement(self) -> str:
     #     """
@@ -415,7 +415,7 @@ class Ingredient:
                         'condensed', 'powdered', 'granulated', 'warm', 'hot',
                         'boiling', 'ice', 'iced', 'jumbo', 'mini', 'whole',
                         'mild', 'spicy', 'optional', 'taste', 'garnish',
-                        'divided', 'plus', 'more', 'about')
+                        'divided', 'plus', 'more', 'about', '')
 
         words = self._name.split(' ')
         for word in words:
