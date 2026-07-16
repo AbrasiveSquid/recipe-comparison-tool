@@ -1,5 +1,5 @@
-from recipe_scraper import fetch_recipe
-from recipe_class import Recipe
+from .recipe_scraper import fetch_recipe
+from .recipe_class import Recipe
 from urllib.parse import urlparse
 
 class RecipeComparator:

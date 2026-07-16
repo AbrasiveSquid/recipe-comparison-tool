@@ -1,6 +1,6 @@
 import os
 import nltk
-from ingredient_class import *
+from .ingredient_class import *
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 local_nltk_data = os.path.join(project_root, 'nltk_data')
