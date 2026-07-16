@@ -116,6 +116,16 @@ class Recipe:
         Precondition:
             other must be the correct type
 
+        Returns:
+            list of dictionary with each dictionary containing the structure:
+                {
+                    "ingredient1": Ingredient,
+                    "ingredient2": Ingredient,
+                    "diffKitchen": (float, str),
+                    "diffMetric": (float, str),
+                    "default": str
+                }
+
         Raises:
             TypeError:
                 if other is not the correct type
@@ -139,8 +149,19 @@ class Recipe:
         # create list of tuples with ingredient in pos 0 and 1, difference in 2
         result = []
         for pair in ingredientPairs:
-            result.append((pair[0].__str__(), pair[1].__str__(),
-                           pair[0].difference(pair[1])))
+            if pair[0].defMeasure == pair[1].defMeasure:
+                defaultMeasure = pair[0].defMeasure
+            else:
+                defaultMeasure = "kitchen" # defaults to kitchen if not same
+
+            pairDict = {
+                "ingredient1": pair[0],
+                "ingredient2": pair[1],
+                "diffKitchen": pair[0].difference(pair[1], kitchenMeasure=True),
+                "diffMetric": pair[0].difference(pair[1], metricMeasure=True),
+                "defaultMeasure": defaultMeasure
+            }
+            result.append(pairDict)
         return result
 
     def _compare_helper(self, firstRecipe: list, secondRecipe: list) -> list:

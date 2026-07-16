@@ -89,12 +89,33 @@ class TestRecipe(unittest.TestCase):
 
 
     def test_compare_recipe(self):
-        ans1 = [("1 egg", "3 eggs", ("-2", "")), ("3/4 cup white sugar", "100 g white sugar", ("0.25", "cup")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml")), ("0 g brown sugar", "50 g brown sugar", ("-50", "g"))]
-        # ans2 = [("1 egg", "0 egg", ("1", "")), ("3/4 cup white sugar", "0 cup white sugar", ("3/4", "cup")), ("25 ml olive oil", "0 ml olive oil", ("25", "ml"))]
+        result = self.recipe1.compare_recipe(self.recipe2)
 
-        self.assertEqual(self.recipe1.compare_recipe(self.recipe2), ans1)
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result),
+                         4)  # Should contain pairs for eggs, white sugar, olive oil, brown sugar
 
+        # Check ingredinet pairs and difference calculation
+        self.assertEqual(str(result[0]["ingredient1"]), "1 egg")
+        self.assertEqual(str(result[0]["ingredient2"]), "3 eggs")
+        self.assertEqual(result[0]["diffKitchen"], ("-2", ""))
 
+        self.assertEqual(str(result[1]["ingredient1"]), "0.75 cup white sugar")
+        self.assertEqual(str(result[1]["ingredient2"]), "100 g white sugar")
+        self.assertEqual(result[1]["diffKitchen"], ("0.25", "cup"))
+        self.assertEqual(result[1]["diffMetric"], ("50", "g"))
+
+        self.assertEqual(str(result[2]["ingredient1"]), "25 ml olive oil")
+        self.assertEqual(str(result[2]["ingredient2"]), "0 ml olive oil")
+        self.assertEqual(result[2]["diffKitchen"], ("1.86", "tablespoon"))
+        self.assertEqual(result[2]["diffMetric"], ("25", "ml"))
+
+        self.assertEqual(str(result[3]["ingredient1"]), "0 g brown sugar")
+        self.assertEqual(str(result[3]["ingredient2"]), "50 g brown sugar")
+        self.assertEqual(result[3]["diffKitchen"], ("-3.75", "tablespoon"))
+        self.assertEqual(result[3]["diffMetric"], ("-50", "g"))
+
+        # check it handles empty ingredient list
         with self.assertRaises(Exception) as context:
             self.recipe1.compare_recipe(self.empty_recipe)
 

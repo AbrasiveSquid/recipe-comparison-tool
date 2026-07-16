@@ -448,6 +448,11 @@ class Ingredient:
             word = self._keywords[i]
             self._keywords[i] = p.singular_noun(word) or word
 
+    def defMeasure(self):
+        """
+        returns the default measurement for this ingredient
+        """
+        return self._defaultMeasure
 
     def keywords(self) -> list:
         """
@@ -669,11 +674,11 @@ class Ingredient:
                         flag to determine if difference returned as kitchen
                         measurement
 
-          metricMeasure:
-            bool:
-                default: false
-                    flag to determine if difference returned as kitchen
-                    metric measurement
+            metricMeasure:
+                bool:
+                    default: false
+                        flag to determine if difference returned as kitchen
+                        metric measurement
 
         Precondition:
             other must be an Ingredient
@@ -699,11 +704,11 @@ class Ingredient:
             amountDiff = self._kitchen_difference(other)
         elif metricMeasure:
             amountDiff = self._metric_difference(other)
-        elif self._defaultMeasure == other._defaultMeasure:
-            if self._defaultMeasure == "metric":
-                amountDiff = self._metric_difference(other)
-            else:
-                amountDiff = self._kitchen_difference(other)
+        # elif self._defaultMeasure == other._defaultMeasure:
+        #     if self._defaultMeasure == "metric":
+        #         amountDiff = self._metric_difference(other)
+        #     else:
+        #         amountDiff = self._kitchen_difference(other)
         else:
              # returns kitchen measurement if not equal
             amountDiff = self._kitchen_difference(other)
