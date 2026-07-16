@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from app import app
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator
+import re
 
 
 @app.route("/")
