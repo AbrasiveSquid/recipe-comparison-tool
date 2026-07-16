@@ -123,7 +123,7 @@ class Recipe:
                     "ingredient2": Ingredient,
                     "diffKitchen": (float, str),
                     "diffMetric": (float, str),
-                    "default": str
+                    "defaultMeasure": str
                 }
 
         Raises:

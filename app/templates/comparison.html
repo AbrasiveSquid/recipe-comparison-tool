@@ -23,6 +23,45 @@
     <p>
         {{ form.submit() }}
     </p>
-    </p>
 </form>
+
+
+    {% if results %}
+        <h3>{{ recipe1.title() }} vs {{ recipe2.title() }}</h3>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>
+                {{ recipe1.title() }} Ingredient
+            </th>
+            <th>
+                {{ recipe2.title() }} Ingredient
+            </th>
+            <th>
+                Difference
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for pair in results %}
+                <tr>
+                    <td>
+                        {{ pair.ingredient1 }}
+                    </td>
+                    <td>
+                        {{ pair.ingredient2 }}
+                    </td>
+                    <td>
+                        {% if pair.defaultMeasure == "metric" %}
+                            {{ pair.diffMetric[0] }} {{ pair.diffMetric[1] }}
+                        {% else %}
+                            {{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
 {% endblock %}

@@ -13,11 +13,16 @@ def index():
 @app.route("/comparison", methods=['GET', 'POST'])
 def comparison():
     form = RecipeForm()
+    comparisonData = None
+    recipe1 = None
+    recipe2 = None
     if form.validate_on_submit():
-        flash("Recipe Comparison requested for recipe {}".format(form.firstRecipe.data))
-        flash("and for recipe {}".format(form.secondRecipe.data))
-        comparison = RecipeComparator(form.firstRecipe.data,form.secondRecipe.data )
-        flash("Compared:".format(print(comparison.get_comparison()))) # this will display it all. I think need to think more about what should be returned then let website decide how it is displayed.
-        # TODO return ingredient objects instead of the str, diff should maybe be some object that can be different amount, inherit properties from ingredient?
-        return redirect(url_for("index"))
-    return render_template("comparison.html", title="Compare Recipes", form=form)
+        comparator = RecipeComparator(form.firstRecipe.data,form.secondRecipe.data)
+        comparisonData = comparator.get_comparison()
+        recipe1 = comparator.get_first_recipe()
+        recipe2 = comparator.get_second_recipe()
+
+    return render_template("comparison.html",
+                           title="Compare Recipes", form=form,
+                           results = comparisonData,
+                           recipe1=recipe1, recipe2=recipe2)

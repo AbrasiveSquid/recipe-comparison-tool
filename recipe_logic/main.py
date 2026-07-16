@@ -14,13 +14,13 @@ class RecipeComparator:
         self.secondRecipe = self._create_recipe(url2)
         self.comparison = self.firstRecipe.compare_recipe(self.secondRecipe)
 
-    def get_firstRecipe(self) -> Recipe:
+    def get_first_recipe(self) -> Recipe:
         """
         getter for firstRecipe
         """
         return self.firstRecipe
     
-    def get_secondRecipe(self) -> Recipe:
+    def get_second_recipe(self) -> Recipe:
         """
         getter for secondRecipe
         """
@@ -73,5 +73,7 @@ class RecipeComparator:
 # r2 = "https://www.inspiredtaste.net/18982/our-favorite-easy-blueberry-muffin-recipe/"
 # r1 = "https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"
 # r2 = "https://sallysbakingaddiction.com/chewy-chocolate-chip-cookies/"
+# r1 = "https://www.loveandlemons.com/brownies-recipe/"
+# r2 = "https://www.allrecipes.com/recipe/10549/best-brownies/"
 # x = RecipeComparator(r1,r2)
-# print(x.get_comparison())
+
