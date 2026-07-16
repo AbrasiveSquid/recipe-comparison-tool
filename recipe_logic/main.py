@@ -65,15 +65,3 @@ class RecipeComparator:
         except ValueError:
             raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
                              "that the url includes http:// or https://")
-
-
-# r1 = "https://www.allrecipes.com/recipe/40403/best-of-the-best-blueberry-muffins/"
-# r2 = "https://www.allrecipes.com/recipe/40403/best-of-the-best-blueberry-muffins/"
-# r1 = "https://www.culinaryhill.com/blueberry-muffins/"
-# r2 = "https://www.inspiredtaste.net/18982/our-favorite-easy-blueberry-muffin-recipe/"
-# r1 = "https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"
-# r2 = "https://sallysbakingaddiction.com/chewy-chocolate-chip-cookies/"
-# r1 = "https://www.loveandlemons.com/brownies-recipe/"
-# r2 = "https://www.allrecipes.com/recipe/10549/best-brownies/"
-# x = RecipeComparator(r1,r2)
-
