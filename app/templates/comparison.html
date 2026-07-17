@@ -28,7 +28,21 @@
 
     {% if results %}
         <h3>{{ recipe1.title() }} vs {{ recipe2.title() }}</h3>
-    <table border="1">
+        <style>
+            table {
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+            }
+            .action-cell {
+                border:none;
+                background: transparent;
+            }
+        </style>
+
+    <table>
         <thead>
         <tr>
             <th>
@@ -40,6 +54,7 @@
             <th>
                 Difference
             </th>
+            <th class="action-cell"></th>
         </tr>
         </thead>
         <tbody>
@@ -52,16 +67,39 @@
                         {{ pair.ingredient2 }}
                     </td>
                     <td>
+                        <span class="measure-display"
+                              data-metric="{{ pair.diffMetric[0]}} {{ pair.diffMetric[1] }}"
+                              data-kitchen="{{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}"
+                              data-current="{{ pair.defaultMeasure }}">
                         {% if pair.defaultMeasure == "metric" %}
                             {{ pair.diffMetric[0] }} {{ pair.diffMetric[1] }}
                         {% else %}
                             {{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}
                         {% endif %}
+                        </span>
+                    </td>
+                        <td class="action-cell">
+                        <button type="button" onclick="toggleMeasurement(this)">Switch</button>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+<script>
+    function toggleMeasurement(button) {
+        const row = button.closest('tr');
+        const span = row.querySelector(".measure-display");
+        const currentState = span.getAttribute("data-current");
+
+        if (currentState === "metric") {
+            span.textContent = span.getAttribute("data-kitchen");
+            span.setAttribute("data-current", "kitchen");
+        } else {
+            span.textContent = span.getAttribute("data-metric");
+            span.setAttribute("data-current", "metric");
+        }
+    }
+</script>
     {% endif %}
 
 {% endblock %}

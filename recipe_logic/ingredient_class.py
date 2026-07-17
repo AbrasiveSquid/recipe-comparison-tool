@@ -84,11 +84,11 @@ class Ingredient:
         ._metricAmount
         """
         measure = measure.lower().strip()
-        
+
         # constants
         KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
         METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
-        OUTLIER_MEAUSRES = ("gill", "pint", "pt", "quart", "qt",
+        OUTLIER_MEASURES = ("gill", "pint", "pt", "quart", "qt",
                             "gallon", "gal", "shot", "oz", "ounce", "lb",
                             "pound", "dash", "pinch", "drop", "smidgen",
                             "fl oz", "fluid ounce")
@@ -137,7 +137,7 @@ class Ingredient:
             "shaved", "shaving", "shavings"
         )
 
-        if measure in OUTLIER_MEAUSRES:
+        if measure in OUTLIER_MEASURES:
             measure, amount = self._convert_from_outlier(measure, amount)
             amount = self._convert_to_fraction(amount)
         elif measure in ODD_MEASURES:
