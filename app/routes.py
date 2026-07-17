@@ -8,8 +8,8 @@ import re
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", title="Home")
-
+    # return render_template("index.html", title="Home")
+    return redirect(url_for("comparison"))
 
 @app.route("/comparison", methods=['GET', 'POST'])
 def comparison():
