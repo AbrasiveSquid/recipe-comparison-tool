@@ -1,5 +1,5 @@
-from .recipe_scraper import fetch_recipe
-from .recipe_class import Recipe
+from recipe_logic.recipe_scraper import fetch_recipe
+from recipe_logic.recipe_class import Recipe
 from urllib.parse import urlparse
 
 class RecipeComparator:
@@ -8,6 +8,7 @@ class RecipeComparator:
     calls the scrapper, creates a Recipe object for each, then compares the recipes and returns
     the comparison
     """
+
 
     def __init__(self, url1:str, url2:str):
         self.firstRecipe = self._create_recipe(url1)
@@ -65,3 +66,9 @@ class RecipeComparator:
         except ValueError:
             raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
                              "that the url includes http:// or https://")
+
+
+
+r2 = "https://www.themediterraneandish.com/how-to-make-falafel/"
+r1 = "https://www.loveandlemons.com/falafel/"
+x = RecipeComparator(r1,r2)

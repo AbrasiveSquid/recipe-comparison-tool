@@ -90,10 +90,62 @@ class Ingredient:
                             "gallon", "gal", "shot", "oz", "ounce", "lb",
                             "pound", "dash", "pinch", "drop", "smidgen",
                             "fl oz", "fluid ounce")
+        ODD_MEASURES = (
+            # Original odd measures
+            "head", "heads", "clove", "cloves",
+            # Produce physical units
+            "sprig", "sprigs",  # herbs (rosemary, thyme)
+            "bunch", "bunches",  # bananas, green onions, cilantro, asparagus
+            "stalk", "stalks",  # celery, lemongrass
+            "ear", "ears",  # corn
+            "bulb", "bulbs",  # garlic, fennel
+            "crown", "crowns",  # broccoli
+            "piece", "pieces", "pc", "pcs",  # ginger, turmeric
+            "leaf", "leaves",  # bay leaves, basil, mint
+            "root", "roots",  # ginger, horseradish
+            "slice", "slices",  # bread, cheese, bacon
+            "cube", "cubes",  # bouillon, ice
+            "strip", "strips",  # bacon, zest
+            # Meat & protein cuts
+            "fillet", "fillets", "filet", "filets",  # fish, beef
+            "breast", "breasts",  # chicken
+            "thigh", "thighs",  # chicken
+            "link", "links",  # sausage
+            "pat", "pats",  # butter
+            "rasher", "rashers",  # bacon (common in UK/Irish recipes)
+            # Commercial packaging / Containers
+            "can", "cans",
+            "jar", "jars",
+            "bottle", "bottles",
+            "package", "packages", "pkg", "pkgs", "pack", "packs",
+            "bag", "bags",
+            "box", "boxes",
+            "container", "containers",
+            "carton", "cartons",
+            "tub", "tubs",
+            "tin", "tins",
+            "envelope", "envelopes",  # yeast, gelatin
+            "block", "blocks",  # cheese, tofu, chocolate
+            "loaf", "loaves",  # bread
+            "pouch", "pouches",
+            "sachet", "sachets",
+            # Informal / Hand measurements
+            "handful", "handfuls",
+            "scoop", "scoops",
+            "shaved", "shaving", "shavings"
+        )
 
         if measure in OUTLIER_MEAUSRES:
             measure, amount = self._convert_from_outlier(measure, amount)
             amount = self._convert_to_fraction(amount)
+        elif measure in ODD_MEASURES:
+            self._state = "thing"
+            self._kitchenAmount = self._verify_amount(amount)
+            self._metricAmount = self._kitchenAmount
+            self._kitchenMeasure = measure
+            self._metricMeasure = measure
+            self._defaultMeasure = "kitchen"
+            return
 
         measure = self._verify_measure(measure)
 
@@ -372,23 +424,6 @@ class Ingredient:
                 cleanName += ' '
         return cleanName.strip()
 
-    # def to_kitchen_measurement(self) -> str:
-    #     """
-    #     returns a string of the measurement with number of cups or tablespoons
-    #     or teaspoons depending on the amount
-    #     """
-    #     if self._state == 'thing':
-    #         return ''
-    #
-    #     measure = self.metric_measure()
-    #
-    #     if measure == 'g' or measure == 'ml':
-    #         amount, measure = self._convert_to_kitchen()
-    #         return f"{amount} {measure}"
-    #     else:
-    #         raise Exception(f"._measure: {self._measure} is not a possible "
-    #                         "value")
-
     def _add_keywords(self) -> None:
         """
         adds all keywords from self._name to self._keywords.
@@ -541,8 +576,8 @@ class Ingredient:
             raise ValueError("self._measure must be 'cup' or 'tablespoon' or"
                              f"'teaspoon', but is {self._measure}")
         if self._density is None:
-            return ValueError(f"Ingredient: {self._name} does not have a "
-                              f"density and converion to metric is not "
+            raise ValueError(f"Ingredient: {self._name} does not have a "
+                              f"density and conversion to metric is not "
                               f"possible")
 
         if self._kitchenMeasure == 'cup':
