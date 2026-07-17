@@ -83,6 +83,8 @@ class Ingredient:
         sets the attributes for ._kitchenAmount, ._kitchenMeasure,
         ._metricAmount
         """
+        measure = measure.lower().strip()
+        
         # constants
         KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
         METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
