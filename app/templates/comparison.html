@@ -2,30 +2,224 @@
 
 {% block content %}
 
-    <h1>Enter urls from two websites to compare the ingredients</h1>
-<form action="" method="post" novalidate>
-    {{ form.hidden_tag() }}
-    <p>
-        First Recipe:<br>
-        {{ form.firstRecipe.label }}<br>
-        {{ form.firstRecipe(size=32) }}<br>
-        {% for error in form.firstRecipe.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        Second Recipe:<br>
-        {{ form.secondRecipe.label }}<br>
-        {{ form.secondRecipe(size=32) }}<br>
-        {% for error in form.secondRecipe.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.submit() }}
-    </p>
-</form>
+<style>
+    .comparison-layout {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+    }
 
+    .comparison-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 1000px;
+        width: 100%;
+    }
+
+    .cards-container {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .recipe-card {
+        background: white;
+        flex: 1;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-a {
+        border-top: 5px solid #2c4c70;
+    }
+
+    .card-b {
+        border-top: 5px solid #3d6a45;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-left h2 {
+        margin: 0;
+        font-size: 16px;
+        font-family: monospace;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .circle-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .icon-a {
+        background-color: #2c4c70;
+    }
+
+    .icon-b {
+        background-color: #3d6a45;
+    }
+
+    .header-right {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .url-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 15px;
+        background-color: #f1eee6;
+        border: 1px solid #dfdcd3;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .url-input:focus {
+        outline: none;
+        border-color: #999;
+    }
+
+    .error-text {
+        color: #cc0000;
+        font-size: 12px;
+    }
+
+    .submit-btn {
+        background-color: #2c4c70;
+        padding: 14px 40px;
+        width: 100%;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: background-color 0.2s;
+    }
+
+    .submit-btn:hover {
+        background-color: #cda45e;
+        color: #1a1814;
+    }
+
+    .card-footer {
+        padding: 15px 20px;
+        font-size: 14px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+    .check-icon {
+        color: #3d6a45;
+        font-size: 16px;
+    }
+
+
+</style>
+
+<div class="comparison-layout">
+    <form action="" method="post" novalidate class="comparison-form">
+    {{ form.hidden_tag() }}
+        <div class="cards-container">
+            <div class="recipe-card card-a">
+                <div class="card-header">
+                    <div class="header-left">
+                        <span class="circle-icon icon-a">A</span>
+                        <h2>Recipe A</h2>
+                    </div>
+                    <span class="header-right">Recipe A</span>
+                </div>
+                <div class="card-body">
+
+                    {{ form.firstRecipe(class="url-input", placeholder="https://...") }}
+                        {% for error in form.firstRecipe.errors %}
+                        <span class="error-text">[{{ error}}]</span>
+                        {% endfor %}
+
+                </div>
+
+                <div class="card-footer">
+        <!--            <span class="check-icon">&#x2714;</span> Ingredients loaded-->
+                </div>
+            </div>
+
+            <div class="recipe-card card-b">
+                <div class="card-header">
+                    <div class="header-left">
+                        <span class="circle-icon icon-b">B</span>
+                        <h2>Recipe B</h2>
+                    </div>
+                    <span class="header-right">Recipe B</span>
+                </div>
+                <div class="card-body">
+
+                    {{ form.secondRecipe(class="url-input", placeholder="https://...") }}
+                        {% for error in form.secondRecipe.errors %}
+                        <span class="error-text">[{{ error}}]</span>
+                        {% endfor %}
+                </div>
+
+                <div class="card-footer">
+        <!--            <span class="check-icon">&#x2714;</span> Ingredients loaded-->
+                </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="submit-btn">
+                    &#x21bb; Compare Recipes
+        </button>
+    </div>
+    </form>
+</div>
 
     {% if results %}
         <h3>{{ recipe1.title() }} vs {{ recipe2.title() }}</h3>
