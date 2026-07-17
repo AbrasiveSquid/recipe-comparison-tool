@@ -1,18 +1,56 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% if title %}
     <title>{{ title }} - Recipe Comparison</title>
     {% else %}
     <title>Welcome to Recipe Comparison Tool</title>
     {% endif %}
+      <style>
+          body {
+              background-color: #f4f0e6;
+              margin: 0;
+              padding: 0;
+          }
+          nav {
+              background-color: #1a1814;
+              margin: 0;
+              padding: 15px;
+              color: white;
+              font-size: 20px;
+          }
+          .nav-items {
+              display: flex;
+              gap: 15px;
+          }
+          a {
+              color: black;
+              display: inline-block;
+          }
+          a:hover {
+              color: #cda45e;
+          }
+          .nav-items a {
+              color: white;
+              display: inline-block;
+              margin-top: 15px;
+              font-size: 15px;
+          }
+          .nav-items a:hover {
+              color: #cda45e;
+            }
+      </style>
   </head>
   <body>
-    <div>
+    <nav>
       Recipe Comparison Tool
-      <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('comparison') }}">Compare Recipes</a>
-    </div>
+        <div class="nav-items">
+          <a href="{{ url_for('index') }}">Home</a>
+          <a href="{{ url_for('comparison') }}">Compare Recipes</a>
+        </div>
+    </nav>
     <hr />
     {% with messages = get_flashed_messages() %} {% if messages %}
     <ul>
