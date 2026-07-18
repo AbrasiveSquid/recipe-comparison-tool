@@ -8,6 +8,58 @@ class Ingredient:
     """
     represents an ingredient in a recipe
     """
+    # constants
+    KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
+    METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
+    OUTLIER_MEASURES = ("gill", "pint", "pt", "quart", "qt",
+                        "gallon", "gal", "shot", "oz", "ounce", "lb",
+                        "pound", "dash", "pinch", "drop", "smidgen",
+                        "fl oz", "fluid ounce")
+    ODD_MEASURES = (
+        # Original odd measures
+        "head", "heads", "clove", "cloves",
+        # Produce physical units
+        "sprig", "sprigs",  # herbs (rosemary, thyme)
+        "bunch", "bunches",  # bananas, green onions, cilantro, asparagus
+        "stalk", "stalks",  # celery, lemongrass
+        "ear", "ears",  # corn
+        "bulb", "bulbs",  # garlic, fennel
+        "crown", "crowns",  # broccoli
+        "piece", "pieces", "pc", "pcs",  # ginger, turmeric
+        "leaf", "leaves",  # bay leaves, basil, mint
+        "root", "roots",  # ginger, horseradish
+        "slice", "slices",  # bread, cheese, bacon
+        "cube", "cubes",  # bouillon, ice
+        "strip", "strips",  # bacon, zest
+        # Meat & protein cuts
+        "fillet", "fillets", "filet", "filets",  # fish, beef
+        "breast", "breasts",  # chicken
+        "thigh", "thighs",  # chicken
+        "link", "links",  # sausage
+        "pat", "pats",  # butter
+        "rasher", "rashers",  # bacon (common in UK/Irish recipes)
+        # Commercial packaging / Containers
+        "can", "cans",
+        "jar", "jars",
+        "bottle", "bottles",
+        "package", "packages", "pkg", "pkgs", "pack", "packs",
+        "bag", "bags",
+        "box", "boxes",
+        "container", "containers",
+        "carton", "cartons",
+        "tub", "tubs",
+        "tin", "tins",
+        "envelope", "envelopes",  # yeast, gelatin
+        "block", "blocks",  # cheese, tofu, chocolate
+        "loaf", "loaves",  # bread
+        "pouch", "pouches",
+        "sachet", "sachets",
+        "sheet", "sheets",
+        # Informal / Hand measurements
+        "handful", "handfuls",
+        "scoop", "scoops",
+        "shaved", "shaving", "shavings"
+    )
 
     def __init__(self, name, amount, measure, ingState=None):
         """
@@ -53,7 +105,6 @@ class Ingredient:
 
 
         """
-        # TODO rewrite
         self._name = self._clean_name(name)
         self._kitchenAmount = None
         self._kitchenMeasure = None
@@ -85,62 +136,12 @@ class Ingredient:
         """
         measure = measure.lower().strip()
 
-        # constants
-        KITCHEN_MEASURES = ('cup', 'tablespoon', 'teaspoon')
-        METRIC_MEASURES = ('ml', 'g', 'l', 'kg')
-        OUTLIER_MEASURES = ("gill", "pint", "pt", "quart", "qt",
-                            "gallon", "gal", "shot", "oz", "ounce", "lb",
-                            "pound", "dash", "pinch", "drop", "smidgen",
-                            "fl oz", "fluid ounce")
-        ODD_MEASURES = (
-            # Original odd measures
-            "head", "heads", "clove", "cloves",
-            # Produce physical units
-            "sprig", "sprigs",  # herbs (rosemary, thyme)
-            "bunch", "bunches",  # bananas, green onions, cilantro, asparagus
-            "stalk", "stalks",  # celery, lemongrass
-            "ear", "ears",  # corn
-            "bulb", "bulbs",  # garlic, fennel
-            "crown", "crowns",  # broccoli
-            "piece", "pieces", "pc", "pcs",  # ginger, turmeric
-            "leaf", "leaves",  # bay leaves, basil, mint
-            "root", "roots",  # ginger, horseradish
-            "slice", "slices",  # bread, cheese, bacon
-            "cube", "cubes",  # bouillon, ice
-            "strip", "strips",  # bacon, zest
-            # Meat & protein cuts
-            "fillet", "fillets", "filet", "filets",  # fish, beef
-            "breast", "breasts",  # chicken
-            "thigh", "thighs",  # chicken
-            "link", "links",  # sausage
-            "pat", "pats",  # butter
-            "rasher", "rashers",  # bacon (common in UK/Irish recipes)
-            # Commercial packaging / Containers
-            "can", "cans",
-            "jar", "jars",
-            "bottle", "bottles",
-            "package", "packages", "pkg", "pkgs", "pack", "packs",
-            "bag", "bags",
-            "box", "boxes",
-            "container", "containers",
-            "carton", "cartons",
-            "tub", "tubs",
-            "tin", "tins",
-            "envelope", "envelopes",  # yeast, gelatin
-            "block", "blocks",  # cheese, tofu, chocolate
-            "loaf", "loaves",  # bread
-            "pouch", "pouches",
-            "sachet", "sachets",
-            # Informal / Hand measurements
-            "handful", "handfuls",
-            "scoop", "scoops",
-            "shaved", "shaving", "shavings"
-        )
 
-        if measure in OUTLIER_MEASURES:
+
+        if measure in self.OUTLIER_MEASURES:
             measure, amount = self._convert_from_outlier(measure, amount)
             amount = self._convert_to_fraction(amount)
-        elif measure in ODD_MEASURES:
+        elif measure in self.ODD_MEASURES:
             self._state = "thing"
             self._kitchenAmount = self._verify_amount(amount)
             self._metricAmount = self._kitchenAmount
@@ -151,7 +152,7 @@ class Ingredient:
 
         measure = self._verify_measure(measure)
 
-        if measure in KITCHEN_MEASURES:
+        if measure in self.KITCHEN_MEASURES:
             self._kitchenMeasure = measure
             self._kitchenAmount = self._verify_amount(amount)
             # _convert_to_metric returns tuple as (amount, measure)
@@ -160,7 +161,7 @@ class Ingredient:
             self._metricMeasure = metricMeasure
             self._defaultMeasure = "kitchen"
 
-        elif measure in METRIC_MEASURES:
+        elif measure in self.METRIC_MEASURES:
             self._defaultMeasure = "metric"
 
             if measure in ('ml', 'g'):
@@ -347,9 +348,9 @@ class Ingredient:
         if ingState is None:
             return ingState
 
-        if ingState.lower() not in ('liquid', 'solid'):
+        if ingState.lower() not in ('liquid', 'solid', "thing"):
             raise ValueError("possible values of ingState is 'liquid' or "
-                             "'solid")
+                             "'solid or 'thing'")
 
         return ingState.lower()
 
@@ -455,20 +456,34 @@ class Ingredient:
                         'mild', 'spicy', 'optional', 'taste', 'garnish',
                         'divided', 'plus', 'more', 'about', '')
 
-        words = self._name.split(' ')
-        for word in words:
-            if word not in FILLER_WORDS:
-                self._keywords.append(word)
-
-        # hardcode white and brown sugar so aren't returned as the same
-        if self._keywords == ['white', 'sugar']:
-            self._keywords = ['white sugar']
-        elif self._keywords == ['brown', 'sugar']:
-            self._keywords = ['brown sugar']
-        elif self._keywords == ['baking', 'soda']:
-            self._keywords = ['baking soda']
-        elif self._keywords == ['baking', 'powder']:
-            self._keywords = ['baking powder']
+        # hardcode ingredients that need multipart descriptors
+        if "sweetened condensed milk" in self._name:
+            self._keywords = ["sweetened condensed milk"]
+        elif "unsweetened condensed milk" in self._name:
+            self._keywords = ["unsweetened condensed milk"]
+        elif "coconut milk" in self._name:
+            self._keywords = ["coconut milk"]
+        elif "baking soda" in self._name:
+            self._keywords = ["baking soda"]
+        elif "baking powder" in self._name:
+            self._keywords = ["baking powder"]
+        elif "white sugar" in self._name:
+            self._keywords = ["white sugar"]
+        elif "brown sugar" in self._name:
+            self._keywords = ["brown sugar"]
+        elif "powdered sugar" in self._name:
+            self._keywords = ["powdered sugar"]
+        elif "confectioners sugar" in self._name:
+            self._keywords = ["confectioners sugar"]
+        elif  "icing sugar" in self._name:
+            self._keywords = ["icing sugar"]
+        elif "evaporated milk" in self._name:
+            self._keywords = ["evaporated milk"]
+        else:
+            words = self._name.split(' ')
+            for word in words:
+                if word not in FILLER_WORDS:
+                    self._keywords.append(word)
 
         # remove keyword plural
         self._unpluralize_keywords()

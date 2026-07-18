@@ -1,7 +1,8 @@
 import requests
 from recipe_scrapers import scrape_html
-# from recipe_scrapers._exceptions import RecipeSchemaNotFound
+from recipe_scrapers._exceptions import RecipeSchemaNotFound
 from curl_cffi import requests as impersonate_requests
+import cloudscraper
 
 
 urls = ["https://sallysbakingaddiction.com/my-favorite-cornbread/", "https://www.lecremedelacrumb.com/best-super-moist-cornbread/","https://www.allrecipes.com/recipe/17891/golden-sweet-cornbread/" ]
@@ -12,9 +13,9 @@ def fetch_recipe(url:str) -> dict | None:
     fetch a recipe from a url with the ingredients as a list in a dictionary and the steps as a 
     str in a dictionary
     """
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+    # headers = {
+    #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    # }
     # try:
     #     response = requests.get(url, headers=headers, timeout=10)
     #     scraper = scrape_html(html=response.text, org_url=url)
@@ -45,6 +46,28 @@ def fetch_recipe(url:str) -> dict | None:
             "steps": scraper.instructions_list()
         }
         return recipe
+    except RecipeSchemaNotFound: # try cloudscraper works for cloudflare
+        try:
+            cloudScrape = cloudscraper.create_scraper()
+            response = cloudScrape.get(url)
+            scraper = scrape_html(html=response.text, org_url=url)
+            recipe = {
+                "title": scraper.title(),
+                "time": f"{scraper.total_time()} minutes",
+                "ingredients": scraper.ingredients(),
+                "steps": scraper.instructions_list()
+            }
+            return recipe
+
+        except Exception as e:
+            print(f"Scraping error for URL {url}: {e}")
+            return None
+        except requests.exceptions.Timeout:
+            print(
+                "The request timed out. The site might be blocking the connection.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
     except Exception as e:
         print(f"Scraping error for URL {url}: {e}")
         return None

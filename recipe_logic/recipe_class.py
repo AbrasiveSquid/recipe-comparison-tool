@@ -35,10 +35,17 @@ class Recipe:
             parsed = parse_ingredient(ingredient)
 
             if parsed.amount:
-                # get the item with highest confidence
-                item = max(parsed.amount, key=lambda x: x.confidence)
-                qty = item.quantity
-                unit = str(item.unit)
+                qty, unit = self._get_qty_and_unit(parsed.amount)
+                # highest_conf_item = max(parsed.amount,
+                #                         key=lambda x: getattr(x, 'confidence',
+                #                                               0))
+                # # is highest confidence amount a composite?
+                # if hasattr(highest_conf_item, 'amounts'):
+                #
+                # # get the item with highest confidence
+                # item = max(parsed.amount, key=lambda x: x.confidence)
+                # qty = item.quantity
+                # unit = str(item.unit)
                 # get name with highest confidence
                 bestName = max(parsed.name,
                                       key=lambda x: x.confidence)
@@ -50,6 +57,37 @@ class Recipe:
                         Ingredient(optionalIngredient.text, 0, 0))
             else:
                 raise ValueError(f"No quantity found: {ingredient}")
+
+    def _get_qty_and_unit(self, ingAmount) -> tuple:
+        """
+        Uses the amount of parsed ingredient and extracts the qty and unit
+        of the item with the highest confidence, unless it is a composite,
+        then finds the metric amount for easier conversion
+
+        Parameters:
+                ingAmount:
+                    ParsedIngredent.amount
+
+        Returns:
+                tuple of a fractions.Fraction and str
+        """
+        # get highest confidence item
+        standaloneAmounts = [amt for amt in ingAmount if
+                              not hasattr(amt, 'amounts')]
+
+        # get the max confidence of standaloneAmounts
+        if standaloneAmounts:
+            bestItem = max(standaloneAmounts,
+                            key=lambda x: x.confidence)
+
+        else: # flatten and take the highest confidence
+            flatAmounts = []
+            for amt in ingAmount:
+                flatAmounts.extend(amt.amounts)
+            bestItem = max(flatAmounts,
+                            key=lambda x: x.confidence)
+
+        return bestItem.quantity, str(bestItem.unit)
 
     def title(self) -> str:
         """
