@@ -66,8 +66,3 @@ class RecipeComparator:
         except ValueError:
             raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
                              "that the url includes http:// or https://")
-
-
-r1 = "https://whatsgabycooking.com/peach-tarte-tatin/"
-r2 = "https://www.seriouseats.com/peach-tarte-tatin-12020722"
-x = RecipeComparator(r1,r2)
