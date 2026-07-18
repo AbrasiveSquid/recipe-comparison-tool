@@ -479,6 +479,10 @@ class Ingredient:
             self._keywords = ["icing sugar"]
         elif "evaporated milk" in self._name:
             self._keywords = ["evaporated milk"]
+        elif "lemon juice" in self._name:
+            self._keywords = ["lemon juice"]
+        elif "lemon zest" in self._name:
+            self._keywords = ["lemon zest"]
         else:
             words = self._name.split(' ')
             for word in words:
