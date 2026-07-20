@@ -12,7 +12,8 @@ class RecipeComparator:
     """
 
 
-    def __init__(self, data1:str, data2:str, dataType:str):
+    def __init__(self, data1:str, data1Type:str,
+                 data2:str, data2Type:str):
         """
         Creates the attributes and calls methods to create recipes and
         run the comparison between recipes
@@ -28,30 +29,41 @@ class RecipeComparator:
 
         Raises:
             ValueError:
-                if dataType is not the correct value ('url' or 'ingreidents')
+                if data1Type is not the correct value ('url' or 'ingredients')
+                if data2Type is not the correct value ('url' or 'ingredients')
             TypeError:
-                if dataType not the correct type
+                if data1Type not the correct type
+                if data2Type not the correct type
                 if data1 not the correct type
                 if data2 not the correct type
         """
-        if not isinstance(dataType, str):
-            raise TypeError(f"dataType must be a str but is a "
-                            f"{type(dataType)}.")
+        if not isinstance(data1Type, str):
+            raise TypeError(f"data1Type must be a str but is a "
+                            f"{type(data1Type)}.")
+        if not isinstance(data2Type, str):
+            raise TypeError(f"data2Type must be a str but is a "
+                            f"{type(data2Type)}.")
         if not isinstance(data1, str):
             raise TypeError(f"data1 must be a str but is a "
                             f"{type(data1)}.")
         if not isinstance(data2, str):
             raise TypeError(f"data2 must be a str but is a "
                             f"{type(data2)}.")
-        if not (dataType == "url" or dataType == "ingredients"):
+        if not (data1Type == "url" or data1Type == "ingredients"):
             raise ValueError(f"dataType must be 'url' or 'ingredients' but is "
-                             f"{dataType}")
+                             f"{data1Type}")
+        if not (data2Type == "url" or data2Type == "ingredients"):
+            raise ValueError(f"dataType must be 'url' or 'ingredients' but is "
+                             f"{data2Type}")
 
-        if dataType == "url":
+        if data1Type == "url":
             self.firstRecipe = self._create_recipe_with_url(data1)
-            self.secondRecipe = self._create_recipe_with_url(data2)
-        elif dataType == "ingredients":
+        elif data1Type == "ingredients":
             self.firstRecipe = self._create_recipe_with_str(data1)
+
+        if data2Type == "url":
+            self.secondRecipe = self._create_recipe_with_url(data2)
+        elif data2Type == "ingredients":
             self.secondRecipe = self._create_recipe_with_str(data2)
 
         self.comparison = self.firstRecipe.compare_recipe(self.secondRecipe)

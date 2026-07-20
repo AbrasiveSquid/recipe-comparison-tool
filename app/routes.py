@@ -19,8 +19,17 @@ def comparison():
     recipe2 = None
     if form.validate_on_submit():
         try:
-            comparator = RecipeComparator(form.firstRecipe.data,
-                                          form.secondRecipe.data)
+            inputA = form.firstRecipe.data if form.type_a.data == 'url' \
+                else form.firstRecipeText.data
+            inputB = form.secondRecipe.data if form.type_b.data == 'url' \
+                else form.secondRecipeText.data
+            if not inputA or not inputB:
+                flash("Please provide input for both recipes.", "error")
+            comparator = RecipeComparator(inputA,
+                                          form.type_a.data,
+                                          inputB,
+                                          form.type_b.data
+                                          )
             comparisonData = comparator.get_comparison()
             recipe1 = comparator.get_first_recipe()
             recipe2 = comparator.get_second_recipe()

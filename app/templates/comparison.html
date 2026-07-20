@@ -23,6 +23,38 @@
         width: 100%;
     }
 
+    .toggle-group {
+        display: inline-flex;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    .toggle-btn {
+        background: #fff;
+        border: none;
+        padding: 6px 12px;
+        font-family: monospace;
+        font-weight: bold;
+        font-size: 12px;
+        color: #333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .toggle-btn:not(.active):hover {
+        background: #f0f0f0;
+    }
+
     .form-actions {
         display: flex;
         justify-content: center;
@@ -89,11 +121,6 @@
         background-color: #3d6a45;
     }
 
-    .header-right {
-        color: #666;
-        font-size: 14px;
-    }
-
     .card-body {
         padding: 20px;
         display: flex;
@@ -101,7 +128,7 @@
         gap: 15px;
     }
 
-    .url-input {
+    .recipe-input {
         width: 100%;
         box-sizing: border-box;
         padding: 15px;
@@ -113,9 +140,20 @@
         color: #333;
     }
 
-    .url-input:focus {
+    .recipe-input:focus {
         outline: none;
         border-color: #999;
+    }
+
+    textarea.recipe-input {
+        outline: none;
+        border-color: #999;
+    }
+
+    textarea.recipe-input {
+        resize: vertical;
+        min-height: 160px;
+        line-height: 1.5;
     }
 
     .error-text {
@@ -162,6 +200,13 @@
         font-size: 16px;
     }
 
+    .recipe-data {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
      @media (max-width: 768px) {
         .cards-container {
             flex-direction: column;
@@ -173,22 +218,38 @@
 <div class="comparison-layout">
     <form action="" method="post" novalidate class="comparison-form">
     {{ form.hidden_tag() }}
+
         <div class="cards-container">
-            <div class="recipe-card card-a">
+
+             <!-- RECIPE A CARD -->
+            <div class="recipe-card card-a" id="card-a">
+                <input type="hidden" name="type_a" class="card-type-input" value="url">
                 <div class="card-header">
                     <div class="header-left">
                         <span class="circle-icon icon-a">A</span>
                         <h2>Recipe A</h2>
                     </div>
-                    <span class="header-right">Recipe A</span>
+                    <div class="toggle-group">
+                         <button type="button" class="toggle-btn active" data-mode="url" onclick="setCardMode('card-a', 'url')">
+                            &#x1F517; URL
+                        </button>
+                        <button type="button" class="toggle-btn" data-mode="ingredients" onclick="setCardMode('card-a', 'ingredients')">
+                            &#x1F4CB; TEXT
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-
-                    {{ form.firstRecipe(class="url-input", placeholder="https://...") }}
-                        {% for error in form.firstRecipe.errors %}
-                        <span class="error-text">[{{ error}}]</span>
+                    <!--url field-->
+                    <div class="mode-url-field">
+                        {{ form.firstRecipe(class="recipe-input", placeholder="https://...") }}
+                            {% for error in form.firstRecipe.errors %}
+                                <span class="error-text">[{{ error}}]</span>
                         {% endfor %}
-
+                    </div>
+                    <!--raw input field-->
+                    <div class="mode-text-field" style="display: none;">
+                        <textarea name="firstRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
+                    </div>
                 </div>
 
                 <div class="card-footer">
@@ -200,20 +261,36 @@
                 </div>
             </div>
 
-            <div class="recipe-card card-b">
+             <!-- RECIPE B CARD -->
+            <div class="recipe-card card-b" id="card-b">
+                <input type="hidden" name="type_b" class="card-type-input" value="url">
                 <div class="card-header">
                     <div class="header-left">
                         <span class="circle-icon icon-b">B</span>
                         <h2>Recipe B</h2>
                     </div>
-                    <span class="header-right">Recipe B</span>
+
+                    <div class="toggle-group">
+                       <button type="button" class="toggle-btn active" data-mode="url" onclick="setCardMode('card-b', 'url')">
+                            &#x1F517; URL
+                        </button>
+                        <button type="button" class="toggle-btn" data-mode="ingredients" onclick="setCardMode('card-b', 'ingredients')">
+                            &#x1F4CB; TEXT
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
-
-                    {{ form.secondRecipe(class="url-input", placeholder="https://...") }}
-                        {% for error in form.secondRecipe.errors %}
-                        <span class="error-text">[{{ error}}]</span>
+                    <!--url field-->
+                    <div class="input-field mode-url-field">
+                        {{ form.secondRecipe(class="recipe-input", placeholder="https://...") }}
+                            {% for error in form.secondRecipe.errors %}
+                                <span class="error-text">[{{ error}}]</span>
                         {% endfor %}
+                    </div>
+                    <!--raw input field-->
+                    <div class="input-field mode-text-field" style="display: none;">
+                        <textarea name="secondRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
+                    </div>
                 </div>
 
                 <div class="card-footer">
@@ -232,7 +309,7 @@
     </div>
     </form>
 </div>
-
+<div class="recipe-data">     
     {% if results %}
         <h3>{{ recipe1.title() }} vs {{ recipe2.title() }}</h3>
         <style>
@@ -292,6 +369,8 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
+
 <script>
     function toggleMeasurement(button) {
         const row = button.closest('tr');
@@ -308,5 +387,33 @@
     }
 </script>
     {% endif %}
+
+<script>
+    function setCardMode(cardId, mode) {
+        const card = document.getElementById(cardId);
+        const urlField = card.querySelector('.mode-url-field');
+        const textField = card.querySelector('.mode-text-field');
+        const hiddenInput = card.querySelector('.card-type-input');
+        const buttons = card.querySelectorAll('.toggle-btn');
+
+        hiddenInput.value = mode;
+
+        if (mode === 'url') {
+            urlField.style.display = 'block';
+            textField.style.display = 'none';
+        } else {
+            urlField.style.display = 'none';
+            textField.style.display = 'block';
+        }
+
+        buttons.forEach(btn => {
+            if (btn.getAttribute('data-mode') === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+</script>
 
 {% endblock %}
