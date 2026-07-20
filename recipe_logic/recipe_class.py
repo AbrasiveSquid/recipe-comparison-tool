@@ -1,6 +1,9 @@
 import os
 import nltk
+import logging
 from .ingredient_class import *
+
+logger = logging.getLogger(__name__)
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 local_nltk_data = os.path.join(project_root, 'nltk_data')
@@ -39,21 +42,26 @@ class Recipe:
             raise TypeError("ingredientList must be a list but is a "
                             f"{type(ingredientList)}")
         for ingredient in ingredientList:
-            parsed = parse_ingredient(ingredient)
+            try:
+                parsed = parse_ingredient(ingredient)
 
-            if parsed.amount:
-                qty, unit = self._get_qty_and_unit(parsed.amount)
-                bestName = max(parsed.name,
-                                      key=lambda x: x.confidence)
-                ingredientName = bestName.text
-                self._ingredients.append(Ingredient(ingredientName, qty, unit))
-                self._ingredientCount += 1
-            elif parsed.name:
-                for optionalIngredient in parsed.name: # no qty available
-                    self._optionalIngredients.append(
-                        Ingredient(optionalIngredient.text, 0, 0))
-            else:
-                raise ValueError(f"No quantity found: {ingredient}")
+                if parsed.amount:
+                    qty, unit = self._get_qty_and_unit(parsed.amount)
+                    bestName = max(parsed.name,
+                                          key=lambda x: x.confidence)
+                    ingredientName = bestName.text
+                    self._ingredients.append(Ingredient(ingredientName, qty, unit))
+                    self._ingredientCount += 1
+                elif parsed.name:
+                    for optionalIngredient in parsed.name: # no qty available
+                        self._optionalIngredients.append(
+                            Ingredient(optionalIngredient.text, 0, 0))
+                else:
+                    logging.warning(f"Skipping unparseable ingredient: "
+                                    f"{ingredient}")
+            except Exception as e:
+                logger.error(f"Error processing line: '{ingredient}': {e}")
+                continue
 
     def _get_qty_and_unit(self, ingAmount) -> tuple:
         """
