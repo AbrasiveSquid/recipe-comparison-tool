@@ -23,9 +23,16 @@ class Recipe:
         self._source = source
         self._instructions = steps
         self._ingredients = []
+        self._ingredientCount = 0
         self._optionalIngredients = []
 
         self._parse_ingredients(ingredientList)
+
+    def ingredient_count(self):
+        """
+        getter method, returns the number of ingredents
+        """
+        return self._ingredientCount
 
     def _parse_ingredients(self, ingredientList:list):
         if not isinstance(ingredientList, list):
@@ -36,21 +43,11 @@ class Recipe:
 
             if parsed.amount:
                 qty, unit = self._get_qty_and_unit(parsed.amount)
-                # highest_conf_item = max(parsed.amount,
-                #                         key=lambda x: getattr(x, 'confidence',
-                #                                               0))
-                # # is highest confidence amount a composite?
-                # if hasattr(highest_conf_item, 'amounts'):
-                #
-                # # get the item with highest confidence
-                # item = max(parsed.amount, key=lambda x: x.confidence)
-                # qty = item.quantity
-                # unit = str(item.unit)
-                # get name with highest confidence
                 bestName = max(parsed.name,
                                       key=lambda x: x.confidence)
                 ingredientName = bestName.text
                 self._ingredients.append(Ingredient(ingredientName, qty, unit))
+                self._ingredientCount += 1
             elif parsed.name:
                 for optionalIngredient in parsed.name: # no qty available
                     self._optionalIngredients.append(

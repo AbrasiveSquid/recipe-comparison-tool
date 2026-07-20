@@ -192,7 +192,11 @@
                 </div>
 
                 <div class="card-footer">
-        <!--            <span class="check-icon">&#x2714;</span> Ingredients loaded-->
+                    {% if recipe1 %}
+                        <span class="check-icon">&#x2714;</span>
+                        {{ recipe1.ingredient_count() }} Ingredients loaded
+                    {% endif %}
+
                 </div>
             </div>
 
@@ -213,7 +217,10 @@
                 </div>
 
                 <div class="card-footer">
-        <!--            <span class="check-icon">&#x2714;</span> Ingredients loaded-->
+                    {% if recipe2 %}
+                        <span class="check-icon">&#x2714;</span>
+                        {{ recipe2.ingredient_count() }} Ingredients loaded
+                    {% endif %}
                 </div>
         </div>
     </div>
