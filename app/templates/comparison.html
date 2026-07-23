@@ -146,11 +146,6 @@
     }
 
     textarea.recipe-input {
-        outline: none;
-        border-color: #999;
-    }
-
-    textarea.recipe-input {
         resize: vertical;
         min-height: 160px;
         line-height: 1.5;
@@ -207,12 +202,148 @@
         justify-content: center;
     }
 
-     @media (max-width: 768px) {
+    .diff-equal {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .diff-recipe-a {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        font-weight: 600;
+    }
+
+    .diff-recipe-b {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+        font-weight: 600;
+    }
+
+    .unit-toggle-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 12px;
+        min-height: 44px;
+        min-width: 44px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.6);
+        font: inherit;
+        font-size: 0.95rem;
+        color: inherit;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.15s ease, transform 0.05s ease;
+    }
+
+    .unit-toggle-badge:active {
+        transform: scale(0.97);
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .toggle-icon {
+        font-size: 0.8em;
+        opacity: 0.6;
+    }
+
+    .diff-recipe-a .unit-toggle-badge {
+        border-color: rgba(13, 71, 161, 0.2);
+    }
+
+    .diff-recipe-b .unit-toggle-badge {
+        border-color: rgba(27, 94, 32, 0.2);
+    }
+
+    table {
+        margin-bottom: 4rem;
+    }
+
+    .table-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+
+    .global-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        min-height: 44px;
+        background-color: #2b2b2b;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .global-toggle-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+
+    .recipe-data {
+        width: 100%;
+        max-width: 1000px;
+        margin: 2rem auto 4rem auto;
+    }
+
+    .table-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        font-family: monospace;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Ensure difference buttons align center without stretching cells */
+    td.diff-recipe-a, td.diff-recipe-b, td.diff-equal {
+        text-align: center;
+        width: 180px;
+    }
+
+    @media (max-width: 600px) {
+        .table-controls {
+            justify-content: center;
+        }
+
+        .global-toggle-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
         .cards-container {
             flex-direction: column;
         }
     }
-
 </style>
 
 <div class="comparison-layout">
@@ -220,7 +351,6 @@
     {{ form.csrf_token }}
 
         <div class="cards-container">
-
              <!-- RECIPE A CARD -->
             <div class="recipe-card card-a" id="card-a">
                 <input type="hidden" name="type_a" class="card-type-input" value="url">
@@ -239,14 +369,12 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!--url field-->
                     <div class="mode-url-field">
                         {{ form.firstRecipe(class="recipe-input", placeholder="https://...") }}
-                            {% for error in form.firstRecipe.errors %}
-                                <span class="error-text">[{{ error}}]</span>
+                        {% for error in form.firstRecipe.errors %}
+                            <span class="error-text">[{{ error}}]</span>
                         {% endfor %}
                     </div>
-                    <!--raw input field-->
                     <div class="mode-text-field" style="display: none;">
                         <textarea name="firstRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
                     </div>
@@ -257,7 +385,6 @@
                         <span class="check-icon">&#x2714;</span>
                         {{ recipe1.ingredient_count() }} Ingredients loaded
                     {% endif %}
-
                 </div>
             </div>
 
@@ -280,14 +407,12 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!--url field-->
                     <div class="input-field mode-url-field">
                         {{ form.secondRecipe(class="recipe-input", placeholder="https://...") }}
-                            {% for error in form.secondRecipe.errors %}
-                                <span class="error-text">[{{ error}}]</span>
+                        {% for error in form.secondRecipe.errors %}
+                            <span class="error-text">[{{ error}}]</span>
                         {% endfor %}
                     </div>
-                    <!--raw input field-->
                     <div class="input-field mode-text-field" style="display: none;">
                         <textarea name="secondRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
                     </div>
@@ -299,96 +424,145 @@
                         {{ recipe2.ingredient_count() }} Ingredients loaded
                     {% endif %}
                 </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-actions">
-        <button type="submit" class="submit-btn">
-                    &#x21bb; Compare Recipes
-        </button>
-    </div>
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">
+                &#x21bb; Compare Recipes
+            </button>
+        </div>
     </form>
 </div>
-<div class="recipe-data">     
-    {% if results %}
-        <h3>{{ recipe1.title() }} vs {{ recipe2.title() }}</h3>
-        <style>
-            table {
-                border-collapse: collapse;
-            }
-            th, td {
-                border: 1px solid black;
-                padding: 8px;
-            }
-            .action-cell {
-                border:none;
-                background: transparent;
-            }
-        </style>
+
+{% if results %}
+<div class="recipe-data">
+    <div class="table-controls">
+        <button type="button" class="global-toggle-btn" onclick="toggleRecipeUnits()">
+            Switch Recipe Units
+        </button>
+    </div>
 
     <table>
         <thead>
         <tr>
-            <th>
-                {{ recipe1.title() }} Ingredient
+            <th class="diff-recipe-a">
+                {% if recipe1.title() %}
+                    {{ recipe1.title() }}
+                {% else %}
+                    Recipe A
+                {% endif %}
+                Ingredients
             </th>
-            <th>
-                {{ recipe2.title() }} Ingredient
+            <th>Difference</th>
+            <th class="diff-recipe-b">
+                {% if recipe2.title() %}
+                    {{ recipe2.title() }}
+                {% else %}
+                    Recipe B
+                {% endif %}
+                Ingredients
             </th>
-            <th>
-                Difference
-            </th>
-            <th class="action-cell"></th>
         </tr>
         </thead>
         <tbody>
             {% for pair in results %}
                 <tr>
-                    <td>
-                        {{ pair.ingredient1 }}
-                    </td>
-                    <td>
-                        {{ pair.ingredient2 }}
-                    </td>
-                    <td>
-                        <span class="measure-display"
-                              data-metric="{{ pair.diffMetric[0]}} {{ pair.diffMetric[1] }}"
-                              data-kitchen="{{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}"
-                              data-current="{{ pair.defaultMeasure }}">
-                        {% if pair.defaultMeasure == "metric" %}
-                            {{ pair.diffMetric[0] }} {{ pair.diffMetric[1] }}
+                    {% set default_mode = 'metric' if pair.defaultMeasure == 'metric' else 'kitchen' %}
+
+                    <!-- Recipe 1 Ingredient -->
+                    <td class="recipe-ingredient"
+                        data-kitchen="{{ pair.ingredient1.kitchen_str() }}"
+                        data-metric="{{ pair.ingredient1.metric_str() }}"
+                        data-current="{{ default_mode }}">
+                        {% if pair.ingredient1.metric_amount() == 0 %}
+                            -
                         {% else %}
-                            {{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}
+                            {{ pair.ingredient1 }}
                         {% endif %}
-                        </span>
                     </td>
-                        <td class="action-cell">
-                        <button type="button" onclick="toggleMeasurement(this)">Switch</button>
+
+                    <!-- Difference Cell -->
+                    {% set current_val = (pair.diffMetric[0] | float) if pair.defaultMeasure == "metric" else (pair.diffKitchen[0] | float) %}
+                    <td class="{% if current_val > 0 %}diff-recipe-a{% elif current_val < 0 %}diff-recipe-b{% else %}diff-equal{% endif %}">
+                        {% if current_val == 0 %}
+                            <span class="measure-display-static">-</span>
+                        {% else %}
+                            <button type="button"
+                                    class="unit-toggle-badge"
+                                    onclick="toggleMeasurement(this)"
+                                    data-metric="{{ pair.diffMetric[0] }} {{ pair.diffMetric[1] }}"
+                                    data-kitchen="{{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}"
+                                    data-current="{{ default_mode }}">
+                                <span class="value-text">
+                                    {% if pair.defaultMeasure == "metric" %}
+                                        {{ pair.diffMetric[0] }} {{ pair.diffMetric[1] }}
+                                    {% else %}
+                                        {{ pair.diffKitchen[0] }} {{ pair.diffKitchen[1] }}
+                                    {% endif %}
+                                </span>
+                                <span class="toggle-icon" aria-hidden="true">⇄</span>
+                            </button>
+                        {% endif %}
+                    </td>
+
+                    <!-- Recipe 2 Ingredient -->
+                    <td class="recipe-ingredient"
+                        data-kitchen="{{ pair.ingredient2.kitchen_str() }}"
+                        data-metric="{{ pair.ingredient2.metric_str() }}"
+                        data-current="{{ default_mode }}">
+                        {% if pair.ingredient2.metric_amount() == 0 %}
+                            -
+                        {% else %}
+                            {{ pair.ingredient2 }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+{% endif %}
 
 <script>
-    function toggleMeasurement(button) {
-        const row = button.closest('tr');
-        const span = row.querySelector(".measure-display");
-        const currentState = span.getAttribute("data-current");
+    function toggleMeasurement(buttonEl) {
+        const current = buttonEl.getAttribute('data-current');
+        const metricVal = buttonEl.getAttribute('data-metric');
+        const kitchenVal = buttonEl.getAttribute('data-kitchen');
+        const valueSpan = buttonEl.querySelector('.value-text');
 
-        if (currentState === "metric") {
-            span.textContent = span.getAttribute("data-kitchen");
-            span.setAttribute("data-current", "kitchen");
+        if (current === 'kitchen') {
+            valueSpan.textContent = metricVal;
+            buttonEl.setAttribute('data-current', 'metric');
         } else {
-            span.textContent = span.getAttribute("data-metric");
-            span.setAttribute("data-current", "metric");
+            valueSpan.textContent = kitchenVal;
+            buttonEl.setAttribute('data-current', 'kitchen');
         }
     }
-</script>
-    {% endif %}
 
-<script>
+    function toggleRecipeUnits() {
+        const cells = document.querySelectorAll('.recipe-ingredient');
+        if (cells.length === 0) return;
+
+        const currentMode = cells[0].getAttribute('data-current') || 'kitchen';
+        const targetMode = currentMode === 'kitchen' ? 'metric' : 'kitchen';
+
+        cells.forEach(cell => {
+            if (cell.textContent.trim() === '-') return;
+
+            const targetValue = cell.getAttribute(`data-${targetMode}`);
+            if (targetValue) {
+                cell.textContent = targetValue;
+                cell.setAttribute('data-current', targetMode);
+            }
+        });
+
+        const label = document.getElementById('global-unit-label');
+        if (label) {
+            label.textContent = targetMode === 'kitchen' ? 'Kitchen' : 'Metric';
+        }
+    }
+
     function setCardMode(cardId, mode) {
         const card = document.getElementById(cardId);
         const urlField = card.querySelector('.mode-url-field');

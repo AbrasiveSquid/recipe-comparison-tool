@@ -124,6 +124,8 @@ class Ingredient:
             self._state = "thing"
             self._metricAmount = amount
             self._kitchenAmount = amount
+            self._kitchenMeasure = ""
+            self._metricMeasure = ""
 
         self._add_keywords()
 
@@ -678,21 +680,39 @@ class Ingredient:
         if self._state == 'thing': # dimensionless
             return f"{self._kitchenAmount} {self._name}"
         elif self._defaultMeasure == "kitchen":
-            return (f"{self.kitchen_amount_str()} {self.kitchen_measure()} "
-                    f"{self._name}")
+            return self.kitchen_str()
         else:
-            return (f"{self.metric_amount_str()} {self.metric_measure()} "
-                    f"{self._name}")
+            return self.metric_str()
 
-    def metric_amount_str(self) -> str:
+    def _metric_amount_str(self) -> str:
         """
         formats the output for a metric amount into a readable string
         converts odd fractions to decimal
         """
         return f"{round(float(self._metricAmount), 2):g}"
 
-    def kitchen_amount_str(self) -> str:
+    def _kitchen_amount_str(self) -> str:
+        """
+        formats the output for a metric amount into a readable string
+        converts odd fractions to decimal
+        """
         return f"{round(float(self._kitchenAmount), 2):g}"
+
+    def metric_str(self) -> str:
+        """
+        returns a formated string of the metric amount and metric measure
+        plus the ingredient name
+        """
+        return (f"{self._metric_amount_str()} {self.metric_measure()} "
+                f"{self._name}")
+
+    def kitchen_str(self) -> str:
+        """
+        returns a formated string of the kitchen amount and kitchen measure
+        plus the ingredient name
+        """
+        return (f"{self._kitchen_amount_str()} {self.kitchen_measure()} "
+                f"{self._name}")
 
     def compare_ingredient(self, other) -> bool:
         """

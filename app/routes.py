@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator
@@ -12,10 +12,30 @@ def index():
 
 @app.route("/comparison", methods=['GET', 'POST'])
 def comparison():
-    form = RecipeForm()
+    if request.method == "POST":
+        # make copy of form
+        form_data = request.form.copy()
+
+        # strip inactive input fields
+        if form_data.get('type_a') != 'url':
+            form_data['firstRecipe'] = ''
+        else:
+            form_data['firstRecipeText'] = ''
+
+        if form_data.get('type_b') != 'url':
+            form_data['secondRecipe'] = ''
+        else:
+            form_data['secondRecipeText'] = ''
+
+        form = RecipeForm(formdata=form_data)
+    else:
+        form = RecipeForm()
+
     comparisonData = None
     recipe1 = None
     recipe2 = None
+
+
     if form.validate_on_submit():
         try:
             inputA = form.firstRecipe.data if form.type_a.data == 'url' \
