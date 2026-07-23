@@ -119,7 +119,7 @@ class RecipeComparator:
                           if line.strip()]
 
         # has empty title, url, and steps, only contains ingredients
-        recipe = ("", "", ingredientList, [""])
+        recipe = Recipe("", "", ingredientList, [""])
 
         return recipe
 

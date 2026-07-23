@@ -2,7 +2,6 @@ from flask import render_template, flash, redirect, url_for
 from app import app
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator
-import re
 
 
 @app.route("/")
@@ -25,14 +24,15 @@ def comparison():
                 else form.secondRecipeText.data
             if not inputA or not inputB:
                 flash("Please provide input for both recipes.", "error")
-            comparator = RecipeComparator(inputA,
-                                          form.type_a.data,
-                                          inputB,
-                                          form.type_b.data
-                                          )
-            comparisonData = comparator.get_comparison()
-            recipe1 = comparator.get_first_recipe()
-            recipe2 = comparator.get_second_recipe()
+            else:
+                comparator = RecipeComparator(inputA,
+                                              form.type_a.data,
+                                              inputB,
+                                              form.type_b.data
+                                              )
+                comparisonData = comparator.get_comparison()
+                recipe1 = comparator.get_first_recipe()
+                recipe2 = comparator.get_second_recipe()
         except ValueError as e:
             flash(str(e), "error")
         except Exception as e:

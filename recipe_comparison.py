@@ -10,5 +10,3 @@ logging.basicConfig(
 )
 
 from app import app
-
-
