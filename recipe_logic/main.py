@@ -156,3 +156,8 @@ class RecipeComparator:
         except ValueError:
             raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
                              "that the url includes http:// or https://")
+
+
+# r2 = "https://bakerbynature.com/the-best-cocoa-fudge-brownies/"
+# r1 = "https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/"
+# x = RecipeComparator(r1, "url", r2, "url")
