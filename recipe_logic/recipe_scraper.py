@@ -4,94 +4,51 @@ from recipe_scrapers._exceptions import RecipeSchemaNotFound
 from curl_cffi import requests as impersonate_requests
 import cloudscraper
 
-
-urls = ["https://sallysbakingaddiction.com/my-favorite-cornbread/", "https://www.lecremedelacrumb.com/best-super-moist-cornbread/","https://www.allrecipes.com/recipe/17891/golden-sweet-cornbread/" ]
-
-
-def fetch_recipe(url:str) -> dict | None:
+def fetch_recipe(url: str) -> dict | None:
     """
-    fetch a recipe from a url with the ingredients as a list in a dictionary and the steps as a 
-    str in a dictionary
+    Attempts to scrape a recipe from a URL using multiple methods.
+    Returns a dict with title, time, ingredients, steps, or None if all methods fail.
     """
-    # headers = {
-    #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    # }
-    # try:
-    #     response = requests.get(url, headers=headers, timeout=10)
-    #     scraper = scrape_html(html=response.text, org_url=url)
-    #         # print(f"Title: {scraper.title()}")
-    #         # print(f"Total Time: {scraper.total_time()} mins")
-    #         # print(scraper.ingredients())
-    #         # print(scraper.instructions())
-    #         # print("\n\n")
-    #     recipe = {
-    #         "title": scraper.title(),
-    #         "time": f"{scraper.total_time()} minutes",
-    #         "ingredients": scraper.ingredients(),
-    #         # "steps": scraper.instructions(),
-    #         "steps": scraper.instructions_list()
-    #     }
-    #     # recipe["steps"] = clean_steps(recipe["steps"])
-    #     return recipe
-    # except RecipeSchemaNotFound:
     try:
-        response = impersonate_requests.get(url, impersonate="chrome120",
-                                            timeout=15)
+        resp = requests.get(url,
+                            headers={"User-Agent": "curl/8.7.1",
+                                     "Accept": "*/*"},
+                            timeout=15)
+        resp.raise_for_status()
+        scraper = scrape_html(html=resp.text, org_url=url)
+        return _build_recipe(scraper)
+    except Exception:
+        pass
+
+    # fallback 2: curl_cffi impersonation (bypasses some TLS fingerprinting)
+    try:
+        response = impersonate_requests.get(url, impersonate="chrome120", timeout=15)
         response.raise_for_status()
         scraper = scrape_html(html=response.text, org_url=url)
-        recipe = {
-            "title": scraper.title(),
-            "time": f"{scraper.total_time()} minutes",
-            "ingredients": scraper.ingredients(),
-            "steps": scraper.instructions_list()
-        }
-        return recipe
-    except RecipeSchemaNotFound: # try cloudscraper works for cloudflare
-        try:
-            cloudScrape = cloudscraper.create_scraper()
-            response = cloudScrape.get(url)
-            scraper = scrape_html(html=response.text, org_url=url)
-            recipe = {
-                "title": scraper.title(),
-                "time": f"{scraper.total_time()} minutes",
-                "ingredients": scraper.ingredients(),
-                "steps": scraper.instructions_list()
-            }
-            return recipe
+        return _build_recipe(scraper)
+    except (RecipeSchemaNotFound,
+            requests.exceptions.RequestException,
+            Exception):
+        pass
 
-        except Exception as e:
-            print(f"Scraping error for URL {url}: {e}")
-            return None
-        except requests.exceptions.Timeout:
-            print(
-                "The request timed out. The site might be blocking the connection.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+    # fallback 3: cloudscraper (handles Cloudflare challenges)
+    try:
+        scraper_cloud = cloudscraper.create_scraper()
+        response = scraper_cloud.get(url, timeout=15)
+        response.raise_for_status()
+        scraper = scrape_html(html=response.text, org_url=url)
+        return _build_recipe(scraper)
+    except Exception:
+        pass
 
-    except Exception as e:
-        print(f"Scraping error for URL {url}: {e}")
-        return None
-    except requests.exceptions.Timeout:
-        print("The request timed out. The site might be blocking the connection.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # all methods fail
+    return None
 
-
-# def clean_steps(steps: str) -> list:
-#     """
-#     Cleans up steps by using a newline to split into a list
-#     """
-#     step_list = []
-#     start_pos = 0
-#     end_pos = 0
-#     for i in range(len(steps)):
-#         if steps[i] == '\n':
-#             step_list.append(steps[start_pos:end_pos])
-#             end_pos += 1
-#             start_pos = end_pos
-#         else:
-#             end_pos += 1
-#
-#     return step_list
-
-fetch_recipe(urls[0])
+def _build_recipe(scraper) -> dict:
+    """Helper to build the recipe dict from a scraper object."""
+    return {
+        "title": scraper.title(),
+        "time": f"{scraper.total_time()} minutes",
+        "ingredients": scraper.ingredients(),
+        "steps": scraper.instructions_list(),
+    }

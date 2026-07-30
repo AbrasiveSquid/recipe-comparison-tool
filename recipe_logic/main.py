@@ -165,10 +165,12 @@ class RecipeExtractionError(Exception):
     def __init__(self, url):
         self.url = url
         super().__init__(
-            f"Sorry, we couldn’t automatically extract the recipe from that link. "
-            f"Please use the 'Paste Ingredients' option to enter the recipe manually."
+            f"Sorry, we couldn’t automatically extract the recipe from {url}. "
+            f"Please use the 'TEXT' option to enter the recipe manually."
         )
 
 # r2 = "https://bakerbynature.com/the-best-cocoa-fudge-brownies/"
 # r1 = "https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/"
-# x = RecipeComparator(r1, "url", r2, "url")
+
+r1 = "https://donalskehan.com/recipes/raspberry-scones/"
+x = RecipeComparator(r1, "url", r1, "url")
