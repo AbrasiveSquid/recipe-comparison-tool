@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app.forms import RecipeForm
-from recipe_logic.main import RecipeComparator
+from recipe_logic.main import RecipeComparator, RecipeExtractionError
 
 
 @app.route("/")
@@ -53,6 +53,8 @@ def comparison():
                 comparisonData = comparator.get_comparison()
                 recipe1 = comparator.get_first_recipe()
                 recipe2 = comparator.get_second_recipe()
+        except RecipeExtractionError as e:
+            flash(str(e), "error")
         except ValueError as e:
             flash(str(e), "error")
         except Exception as e:

@@ -714,26 +714,52 @@ class Ingredient:
         return (f"{self._kitchen_amount_str()} {self.kitchen_measure()} "
                 f"{self._name}")
 
-    def compare_ingredient(self, other) -> bool:
+    # def compare_ingredient(self, other) -> bool:
+    #     """
+    #     checks if other is a same or similar ingredient as self and returns
+    #     a boolean
+    #
+    #     Precondition:
+    #         other must be the correct type
+    #
+    #     Raises:
+    #         TypeError:
+    #             if other not the correct type
+    #     """
+    #     if not isinstance(other, Ingredient):
+    #         raise TypeError("other must be an Ingredient but is a "
+    #                         f"{type(other)}")
+    #
+    #     for keyword in self._keywords:
+    #         if keyword in other._keywords:
+    #             return True
+    #     return False
+
+    def get_similarity_score(self, other: "Ingredient") -> float:
         """
-        checks if other is a same or similar ingredient as self and returns
-        a boolean
+        Calculates the ratio of matching keywords to total unique keywords
 
         Precondition:
             other must be the correct type
 
-        Raises:
-            TypeError:
-                if other not the correct type
+        Returns:
+            float:
+                A score between 0.0 and 1.0
         """
         if not isinstance(other, Ingredient):
-            raise TypeError("other must be an Ingredient but is a "
-                            f"{type(other)}")
+            raise TypeError(
+                f"other must be an Ingredient but is a {type(other)}")
 
-        for keyword in self._keywords:
-            if keyword in other._keywords:
-                return True
-        return False
+        set1 = set(self._keywords)
+        set2 = set(other._keywords)
+
+        intersection = set1.intersection(set2)
+        union = set1.union(set2)
+
+        if not union:
+            return 0.0
+
+        return len(intersection) / len(union)
 
     def difference(self, other, kitchenMeasure:bool=False,
                    metricMeasure:bool=False) -> tuple:

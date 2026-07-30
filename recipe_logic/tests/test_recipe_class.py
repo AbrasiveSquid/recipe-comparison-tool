@@ -123,3 +123,188 @@ class TestRecipe(unittest.TestCase):
             str(context.exception),
             "self and other must contain a list of ingredients"
         )
+
+    def test_compare_helper(self):
+        # Setup recipe with chocolate AND chocolate chips
+        ing_a = [
+            "4 ounces semi-sweet chocolate",
+            "1 cup semi-sweet chocolate chips"
+        ]
+        # Setup recipe with ONLY chocolate chips
+        ing_b = [
+            "3/4 cup chocolate chips"
+        ]
+
+        recipe_a = Recipe("Recipe A", "x", ing_a, ["step"])
+        recipe_b = Recipe("Recipe B", "x", ing_b, ["step"])
+
+        result = recipe_a.compare_recipe(recipe_b)
+
+        # Expected result structure:
+        # 1. "4 ounces semi-sweet chocolate" should fail to match and pair with empty clone
+        # 2. "1 cup semi-sweet chocolate chips" should correctly match "3/4 cup chocolate chips"
+
+        self.assertEqual(len(result), 2)
+
+        # Find the pair containing chocolate chips
+        chip_pair = None
+        for pair in result:
+            if "chips" in str(pair["ingredient1"]).lower():
+                chip_pair = pair
+                break
+
+        self.assertIsNotNone(chip_pair,
+                             "Chocolate chips from Recipe A was not processed")
+        self.assertIn("chips", str(chip_pair["ingredient2"]).lower(),
+                      "Chocolate chips in Recipe A failed to pair with Chocolate chips in Recipe B")
+
+        def test_compare_recipe_edge_cases(self):
+            # Test 1: Completely empty recipe vs populated recipe
+            empty_recipe = Recipe("Empty", "x", [], ["step"])
+            populated_recipe = Recipe("Populated", "x",
+                                      ["1 cup flour", "2 eggs"], ["step"])
+
+            result = populated_recipe.compare_recipe(empty_recipe)
+            self.assertEqual(len(result), 2)
+            self.assertEqual(str(result[0]["ingredient1"]), "1 cup flour")
+            self.assertEqual(str(result[0]["ingredient2"]), "0 cup flour")
+            self.assertEqual(str(result[1]["ingredient1"]), "2 eggs")
+            self.assertEqual(str(result[1]["ingredient2"]), "0 eggs")
+
+            # Test 2: Reverse empty comparison (empty recipe as self)
+            result_rev = empty_recipe.compare_recipe(populated_recipe)
+            self.assertEqual(len(result_rev), 2)
+            self.assertEqual(str(result_rev[0]["ingredient1"]), "0 cup flour")
+            self.assertEqual(str(result_rev[0]["ingredient2"]), "1 cup flour")
+
+            # Test 3: Out-of-order matching with identical items
+            # Ensures similarity scoring doesn't rely on strict index alignment
+            recipe1 = Recipe("R1", "x",
+                             ["1 cup milk", "2 tbsp butter", "3 tsp salt"],
+                             ["step"])
+            recipe2 = Recipe("R2", "x",
+                             ["3 tsp kosher salt", "1 cup whole milk",
+                              "2 tablespoons butter"], ["step"])
+
+            result_order = recipe1.compare_recipe(recipe2)
+            self.assertEqual(len(result_order), 3)
+            self.assertEqual(str(result_order[0]["ingredient1"]), "1 cup milk")
+            self.assertIn("milk", str(result_order[0]["ingredient2"]))
+            self.assertEqual(str(result_order[1]["ingredient1"]),
+                             "2 tbsp butter")
+            self.assertIn("butter", str(result_order[1]["ingredient2"]))
+            self.assertEqual(str(result_order[2]["ingredient1"]), "3 tsp salt")
+            self.assertIn("salt", str(result_order[2]["ingredient2"]))
+
+            # Test 4: Ambiguous overlapping keywords (e.g., "vanilla extract" vs "almond extract" and "vanilla bean")
+            recipe_ambig_1 = Recipe("RA1", "x", ["1 tsp vanilla extract",
+                                                 "2 pods vanilla bean"],
+                                    ["step"])
+            recipe_ambig_2 = Recipe("RA2", "x", ["1 tsp almond extract",
+                                                 "1 pod vanilla bean"],
+                                    ["step"])
+
+            result_ambig = recipe_ambig_1.compare_recipe(recipe_ambig_2)
+            self.assertEqual(len(result_ambig), 2)
+            # Vanilla extract should find extract/vanilla match, vanilla bean maps to vanilla bean
+            self.assertEqual(str(result_ambig[0]["ingredient1"]),
+                             "1 tsp vanilla extract")
+            self.assertIn("extract", str(result_ambig[0]["ingredient2"]))
+            self.assertEqual(str(result_ambig[1]["ingredient1"]),
+                             "2 pods vanilla bean")
+            self.assertIn("vanilla bean", str(result_ambig[1]["ingredient2"]))
+
+            # Test 5: Completely disjoint recipes (no shared vocabulary words)
+            recipe_food = Recipe("Food", "x", ["1 lb beef", "2 potatoes"],
+                                 ["step"])
+            recipe_hardware = Recipe("Hardware", "x",
+                                     ["10 mm socket", "4 bolts"], ["step"])
+
+            result_disjoint = recipe_food.compare_recipe(recipe_hardware)
+            self.assertEqual(len(result_disjoint), 4)
+            # Should pair all items from recipe_food with empty clones, followed by recipe_hardware unmatched items
+            self.assertEqual(str(result_disjoint[0]["ingredient1"]),
+                             "1 lb beef")
+            self.assertEqual(str(result_disjoint[0]["ingredient2"]),
+                             "0 lb beef")
+            self.assertEqual(str(result_disjoint[3]["ingredient1"]),
+                             "0 mm socket")
+            self.assertEqual(str(result_disjoint[3]["ingredient2"]),
+                             "10 mm socket")
+
+             # Test 1: Substring overlaps and singular/plural variations
+            ing_a = ["1 large egg", "2 cloves garlic", "1 tbsp olive oil"]
+            ing_b = ["3 small eggs", "1 clove garlic", "2 cups extra virgin olive oil"]
+
+            r1 = Recipe("R1", "x", ing_a, ["step"])
+            r2 = Recipe("R2", "x", ing_b, ["step"])
+            result = r1.compare_recipe(r2)
+
+            self.assertEqual(len(result), 3)
+            self.assertEqual(str(result[0]["ingredient1"]), "1 large egg")
+            self.assertIn("egg", str(result[0]["ingredient2"]))
+            self.assertEqual(str(result[1]["ingredient1"]), "2 cloves garlic")
+            self.assertIn("garlic", str(result[1]["ingredient2"]))
+            self.assertEqual(str(result[2]["ingredient1"]), "1 tbsp olive oil")
+            self.assertIn("olive oil", str(result[2]["ingredient2"]))
+
+            # Test 2: Highly overlapping multi-word ingredients competing for the same match
+            # Ensures similarity scoring cleanly splits common tokens without cross-wiring wrong items
+            ing_c = ["1 cup brown sugar", "1 cup white sugar"]
+            ing_d = ["1 cup granulated white sugar", "1 cup dark brown sugar"]
+
+            r3 = Recipe("R3", "x", ing_c, ["step"])
+            r4 = Recipe("R4", "x", ing_d, ["step"])
+            result2 = r3.compare_recipe(r4)
+
+            self.assertEqual(len(result2), 2)
+            # Brown sugar should map to brown sugar, white to white
+            self.assertIn("brown sugar",
+                          str(result2[0]["ingredient1"]).lower())
+            self.assertIn("brown sugar",
+                          str(result2[0]["ingredient2"]).lower())
+            self.assertIn("white sugar",
+                          str(result2[1]["ingredient1"]).lower())
+            self.assertIn("white sugar",
+                          str(result2[1]["ingredient2"]).lower())
+
+            # Test 3: Partial keyword matches with mismatched counts (more items in recipe 2)
+            ing_e = ["1 tsp salt"]
+            ing_f = ["1 tsp sea salt", "1 pinch kosher salt",
+                     "1 dash celery salt"]
+
+            r5 = Recipe("R5", "x", ing_e, ["step"])
+            r6 = Recipe("R6", "x", ing_f, ["step"])
+            result3 = r5.compare_recipe(r6)
+
+            # 1 match from r5 + 2 leftover unmatched items from r6 appended at end = 3 total pairs
+            self.assertEqual(len(result3), 3)
+            self.assertIn("salt", str(result3[0]["ingredient1"]))
+            self.assertIn("salt", str(result3[0]["ingredient2"]))
+            # Remaining items from r6 should have empty clones as ingredient1
+            self.assertEqual(str(result3[1]["ingredient1"]),
+                             "0 pinch kosher salt")
+            self.assertEqual(str(result3[2]["ingredient1"]),
+                             "0 dash celery salt")
+
+            # Test 4: Order preservation check with interleaved matches and unique items
+            ing_g = ["apple", "banana", "cherry", "date"]
+            ing_h = ["banana", "blueberry", "apple", "fig"]
+
+            r7 = Recipe("R7", "x", ing_g, ["step"])
+            r8 = Recipe("R8", "x", ing_h, ["step"])
+            result4 = r7.compare_recipe(r8)
+
+            # Should preserve r7's exact index layout: apple(0), banana(1), cherry(2), date(3), plus unmatched r8 items at the end
+            self.assertEqual(str(result4[0]["ingredient1"]), "apple")
+            self.assertIn("apple", str(result4[0]["ingredient2"]))
+            self.assertEqual(str(result4[1]["ingredient1"]),
+                             "bannana" if "bannana" in str(
+                                 result4[1]["ingredient1"]) else "banana")
+            self.assertIn("banana", str(result4[1]["ingredient2"]))
+            self.assertEqual(str(result4[2]["ingredient1"]), "cherry")
+            self.assertEqual(str(result4[2]["ingredient2"]),
+                             "0 cherry")  # unmatched, gets clone
+            self.assertEqual(str(result4[3]["ingredient1"]), "date")
+            self.assertEqual(str(result4[3]["ingredient2"]),
+                             "0 date")  # unmatched, gets clone

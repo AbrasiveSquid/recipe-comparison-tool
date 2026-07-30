@@ -5,7 +5,7 @@ from recipe_logic.recipe_class import Recipe
 from urllib.parse import urlparse
 
 class RecipeComparator:
-    """ 
+    """
     main program class for recipe comparison. Receives two url, validates them,
     calls the scrapper, creates a Recipe object for each, then compares the recipes and returns
     the comparison
@@ -73,13 +73,13 @@ class RecipeComparator:
         getter for firstRecipe
         """
         return self.firstRecipe
-    
+
     def get_second_recipe(self) -> Recipe:
         """
         getter for secondRecipe
         """
         return self.secondRecipe
-    
+
     def get_comparison(self) -> list:
         """
         getting for the comparison of recipes
@@ -94,13 +94,14 @@ class RecipeComparator:
         """
         self._validate_url(url)
         recipeScraped = fetch_recipe(url)
-        if recipeScraped:
-            recipe = Recipe(recipeScraped["title"], url,
-                            recipeScraped["ingredients"],
-                            recipeScraped["steps"])
-        else:
-            raise ValueError(f"Failed to extract recipe data from url: "
-                             f"{url}")
+
+        if not recipeScraped:
+            raise RecipeExtractionError(url)
+
+        recipe = Recipe(recipeScraped["title"], url,
+                        recipeScraped["ingredients"],
+                        recipeScraped["steps"])
+
         return recipe
 
     def _create_recipe_with_str(self, data:str):
@@ -157,6 +158,16 @@ class RecipeComparator:
             raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
                              "that the url includes http:// or https://")
 
+
+
+class RecipeExtractionError(Exception):
+    """Raised when a recipe cannot be extracted from a URL."""
+    def __init__(self, url):
+        self.url = url
+        super().__init__(
+            f"Sorry, we couldn’t automatically extract the recipe from that link. "
+            f"Please use the 'Paste Ingredients' option to enter the recipe manually."
+        )
 
 # r2 = "https://bakerbynature.com/the-best-cocoa-fudge-brownies/"
 # r1 = "https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/"

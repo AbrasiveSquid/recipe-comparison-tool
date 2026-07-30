@@ -185,7 +185,7 @@ class Recipe:
 
         # match ingredients as a list of tuples
         thisRecipe = self._ingredients
-        thisRecipe.reverse() # reverse more efficient to pop from end in loop
+        # thisRecipe.reverse() # reverse more efficient to pop from end in loop
         otherRecipe = other._ingredients
         ingredientPairs = self._compare_helper(thisRecipe, otherRecipe)
 
@@ -234,31 +234,69 @@ class Recipe:
         """
         ingredientPairs = []
 
-        while len(firstRecipe) and len(secondRecipe):
-            thisIngredient = firstRecipe.pop()
+        # while len(firstRecipe) and len(secondRecipe):
+        #     thisIngredient = firstRecipe.pop()
+        #
+        #     for i in range(len(secondRecipe)):
+        #         if thisIngredient.compare_ingredient(secondRecipe[i]):
+        #             ingredientPairs.append(
+        #                 (thisIngredient, secondRecipe.pop(i)))
+        #             break
+        #     else:
+        #         # if no matching ingredient, append an emptied clone ingredient
+        #         duplicateIng = thisIngredient.clone()
+        #         duplicateIng.empty_ingredient()
+        #         ingredientPairs.append((thisIngredient, duplicateIng))
+        #
+        # # add remaining ingredients with an emptied clone ingredient
+        # for ingredient in firstRecipe:
+        #     duplicateIng = ingredient.clone()
+        #     duplicateIng.empty_ingredient()
+        #     ingredientPairs.append((ingredient, duplicateIng))
+        #
+        #
+        # for ingredient in secondRecipe:
+        #     duplicateIng = ingredient.clone()
+        #     duplicateIng.empty_ingredient()
+        #     ingredientPairs.append((duplicateIng, ingredient))
+        # Track indices of ingredients that have already been paired
 
-            for i in range(len(secondRecipe)):
-                if thisIngredient.compare_ingredient(secondRecipe[i]):
-                    ingredientPairs.append(
-                        (thisIngredient, secondRecipe.pop(i)))
-                    break
+        matchedFirst = set()
+        matchedSecond = set()
+
+        # sore for all possible ingredient pairs
+        scoreMatrix = []
+        for i, ing1 in enumerate(firstRecipe):
+            for j, ing2 in enumerate(secondRecipe):
+                score = ing1.get_similarity_score(ing2)
+                if score > 0:
+                    scoreMatrix.append((score, i, j))
+
+        # sort matrix by score
+        scoreMatrix.sort(key=lambda x: x[0], reverse=True)
+        first_matches = {}
+        # pairs based on maximum score
+        for score, i, j in scoreMatrix:
+            if i not in matchedFirst and j not in matchedSecond:
+                first_matches[i] = secondRecipe[j]
+                matchedFirst.add(i)
+                matchedSecond.add(j)
+
+        # add remaining unmatched items from firstRecipe
+        for i, ingredient in enumerate(firstRecipe):
+            if i in first_matches:
+                ingredientPairs.append((ingredient, first_matches[i]))
             else:
-                # if no matching ingredient, append an emptied clone ingredient
-                duplicateIng = thisIngredient.clone()
+                duplicateIng = ingredient.clone()
                 duplicateIng.empty_ingredient()
-                ingredientPairs.append((thisIngredient, duplicateIng))
+                ingredientPairs.append((ingredient, duplicateIng))
 
-        # add remaining ingredients with an emptied clone ingredient
-        for ingredient in firstRecipe:
-            duplicateIng = ingredient.clone()
-            duplicateIng.empty_ingredient()
-            ingredientPairs.append((ingredient, duplicateIng))
-
-
-        for ingredient in secondRecipe:
-            duplicateIng = ingredient.clone()
-            duplicateIng.empty_ingredient()
-            ingredientPairs.append((duplicateIng, ingredient))
+        # add remaining unmatched items from secondRecipe
+        for j, ingredient in enumerate(secondRecipe):
+            if j not in matchedSecond:
+                duplicateIng = ingredient.clone()
+                duplicateIng.empty_ingredient()
+                ingredientPairs.append((duplicateIng, ingredient))
 
         return ingredientPairs
 
