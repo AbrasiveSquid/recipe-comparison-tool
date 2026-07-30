@@ -54,6 +54,7 @@ def comparison():
                 recipe1 = comparator.get_first_recipe()
                 recipe2 = comparator.get_second_recipe()
         except RecipeExtractionError as e:
+            app.logger.error(f"Scraping failed for URL: {e.url}")
             flash(str(e), "error")
         except ValueError as e:
             flash(str(e), "error")
