@@ -3,7 +3,6 @@
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="color-scheme" content="light">
     {% if title %}
     <title>{{ title }} - Recipe Comparison</title>
     {% else %}
@@ -12,19 +11,37 @@
       <style>
           :root {
               color-scheme: light;
+              --bg-color: #f4f0e6;
+              --text-color: #333333;
           }
+
+          [data-theme="dark"] {
+              color-scheme: dark;
+              --bg-color: #0F1117;
+              --text-color: #E8ECF0;
+          }
+
           body {
-              background-color: #f4f0e6;
+              background-color: var(--bg-color);
               margin: 0;
               padding: 0;
-              color: #333333;
+              color: var(--text-color);
+              transition: background-color 0.2s, color 0.2s;
           }
           nav {
               background-color: #1a1814;
               margin: 0;
-              padding: 15px;
+              padding: 15px 20px;
               color: white;
               font-size: 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+          }
+          .nav-left {
+              display: flex;
+              flex-direction: column;
+              gap: 5px;
           }
           .nav-items {
               display: flex;
@@ -40,29 +57,138 @@
           .nav-items a {
               color: white;
               display: inline-block;
-              margin-top: 15px;
               font-size: 15px;
+              text-decoration: none;
           }
           .nav-items a:hover {
               color: #cda45e;
-            }
+          }
+          .theme-toggle-btn {
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              color: white;
+              padding: 8px 14px;
+              border-radius: 6px;
+              font-size: 14px;
+              cursor: pointer;
+              transition: background-color 0.2s;
+          }
+          .theme-toggle-btn:hover {
+              background: rgba(255, 255, 255, 0.2);
+              color: #cda45e;
+          }
+
+          /* Dark Mode Overrides for your specific view components */
+          [data-theme="dark"] .recipe-card {
+              background-color: #161B24 !important;
+              border-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] .card-header {
+              border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] .recipe-input {
+              background-color: #0F1117 !important;
+              color: #E8ECF0 !important;
+              border-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] .recipe-input::placeholder {
+              color: #7A8799 !important;
+          }
+          [data-theme="dark"] .toggle-group {
+              background-color: #161B24 !important;
+              border-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] .toggle-btn {
+              background: #161B24 !important;
+              color: #7A8799 !important;
+          }
+          [data-theme="dark"] .toggle-btn.active {
+              background: #2b3544 !important;
+              color: #E8ECF0 !important;
+          }
+          [data-theme="dark"] .card-footer,
+          [data-theme="dark"] small {
+              color: #7A8799 !important;
+          }
+          [data-theme="dark"] .submit-btn {
+              background-color: #E05A3A !important;
+              color: #E8ECF0 !important;
+          }
+          [data-theme="dark"] table {
+              background-color: #161B24 !important;
+              border-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] th,
+          [data-theme="dark"] td {
+              border-color: rgba(255, 255, 255, 0.08) !important;
+              color: #E8ECF0 !important;
+          }
+          [data-theme="dark"] .diff-equal {
+              background-color: #11141c !important;
+              color: #7A8799 !important;
+          }
+          [data-theme="dark"] .diff-recipe-a {
+              background-color: #112238 !important;
+              color: #85bbf0 !important;
+          }
+          [data-theme="dark"] .diff-recipe-b {
+              background-color: #132b1a !important;
+              color: #8ae396 !important;
+          }
+          [data-theme="dark"] .unit-toggle-badge {
+              background-color: rgba(255, 255, 255, 0.05) !important;
+              border-color: rgba(255, 255, 255, 0.12) !important;
+              color: #E8ECF0 !important;
+          }
+          [data-theme="dark"] .global-toggle-btn {
+              background-color: #161B24 !important;
+              color: #E8ECF0 !important;
+              border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          }
+          [data-theme="dark"] .input-clear-btn {
+              color: #7A8799 !important;
+          }
       </style>
+      <script>
+          // Run immediately before render to avoid flash of white background
+          (function() {
+              const savedTheme = localStorage.getItem('theme') || 'light';
+              document.documentElement.setAttribute('data-theme', savedTheme);
+          })();
+      </script>
   </head>
   <body>
     <nav>
-      Recipe Comparison Tool
-        <div class="nav-items">
-          <a href="{{ url_for('index') }}">Home</a>
-          <a href="{{ url_for('comparison') }}">Compare Recipes</a>
-        </div>
+      <div class="nav-left">
+          Recipe Comparison Tool
+          <div class="nav-items">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('comparison') }}">Compare Recipes</a>
+          </div>
+      </div>
+      <button type="button" class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()">
+          🌓 Theme
+      </button>
     </nav>
-    <hr />
+    <hr style="margin:0; border:0; border-top:1px solid #333;" />
+
     {% with messages = get_flashed_messages() %} {% if messages %}
     <ul>
       {% for message in messages %}
       <li>{{ message }}</li>
       {% endfor %}
     </ul>
-    {% endif %} {% endwith %} {% block content %} {% endblock %}
+    {% endif %} {% endwith %}
+
+    {% block content %} {% endblock %}
+
+    <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+    </script>
   </body>
 </html>
