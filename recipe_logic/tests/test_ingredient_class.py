@@ -227,35 +227,6 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.teaspoonMetricVegOil._convert_to_kitchen(),(1, 'teaspoon'))
         self.assertEqual(self.halfTeaspoonMetricVegOil._convert_to_kitchen(),(0.5, 'teaspoon'))
 
-    # def test_to_kitchen_measurement(self):
-    #     # solids
-    #     # cup
-    #     self.assertEqual(self.metricCupFlour.to_kitchen_measurement(), '1 cup')
-    #     self.assertEqual(self.twoAndHalfMetricCupFlour.to_kitchen_measurement(),'2.5 cup')
-    #     self.assertEqual(self.thirtyCupsFlour.to_kitchen_measurement(),'30 cup')
-    #     self.assertEqual(self.quarterCupFlour.to_kitchen_measurement(),'0.25 cup')
-    #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricFlour.to_kitchen_measurement(), '1 tablespoon')
-    #     self.assertEqual(self.halfTablespoonMetricFlour.to_kitchen_measurement(), '0.5 tablespoon')
-    #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricFlour.to_kitchen_measurement(),'1 teaspoon')
-    #     self.assertEqual(self.halfTeaspoonMetricFlour.to_kitchen_measurement(), '0.5 teaspoon')
-    #
-    #     # liquids
-    #     # cup
-    #     self.assertEqual(self.metricCupVegOil.to_kitchen_measurement(), '1 cup')
-    #     self.assertEqual(
-    #         self.twoAndHalfMetricCupVegOil.to_kitchen_measurement(), '2.5 cup')
-    #     self.assertEqual(self.thirtyCupsVegOil.to_kitchen_measurement(),'30 cup')
-    #     self.assertEqual(self.quarterCupVegOil.to_kitchen_measurement(),'0.25 cup')
-    #     # tablespoons
-    #     self.assertEqual(self.tablespoonMetricVegOil.to_kitchen_measurement(),'1 tablespoon')
-    #     self.assertEqual(
-    #         self.halfTablespoonMetricVegOil.to_kitchen_measurement(),'0.5 tablespoon')
-    #     # teaspoons
-    #     self.assertEqual(self.teaspoonMetricVegOil.to_kitchen_measurement(),'1 teaspoon')
-    #     self.assertEqual(self.halfTeaspoonMetricVegOil.to_kitchen_measurement(),'0.5 teaspoon')
-
     def test_compare_ingredient(self):
         brownSugar = Ingredient('Brown Sugar', 100, 'g')
         self.assertTrue(brownSugar.compare_ingredient(self.extraDarkBrownSugar))
@@ -267,7 +238,6 @@ class TestIngredient(unittest.TestCase):
 
         # similar ingredients
         self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
-
 
     def test_difference(self):
         self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour), ('-1.5', 'cup'))
