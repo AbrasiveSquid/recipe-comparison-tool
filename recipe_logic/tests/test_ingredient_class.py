@@ -82,16 +82,13 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.flour.keywords(), ['flour'])
         self.assertEqual(self.extraVirginOliveOil.keywords(), ['olive', 'oil'])
         self.assertEqual(self.whiteSugar.keywords(), ['white sugar'])
-        self.assertEqual(self.icingSugar.keywords(), ['icing', 'sugar'])
+        self.assertEqual(self.icingSugar.keywords(), ['icing sugar'])
         self.assertEqual(self.allPurposeFlour.keywords(), ['flour'])
         self.assertEqual(self.twoEggs.keywords(), ['egg'])
         self.assertEqual(self.onePotato.keywords(), ["potato"])
         self.assertEqual(self.sixPotatoes.keywords(), ["potato"])
         self.assertEqual(self.oneBlackBerry.keywords(), ["black", "berry"])
         self.assertEqual(self.tenBlueBerries.keywords(), ["blue", "berry"])
-
-
-
 
     def test_verify_amount(self):
         self.assertEqual(self.flour._verify_amount(10), fractions.Fraction(10,1))
@@ -227,17 +224,41 @@ class TestIngredient(unittest.TestCase):
         self.assertEqual(self.teaspoonMetricVegOil._convert_to_kitchen(),(1, 'teaspoon'))
         self.assertEqual(self.halfTeaspoonMetricVegOil._convert_to_kitchen(),(0.5, 'teaspoon'))
 
-    def test_compare_ingredient(self):
-        brownSugar = Ingredient('Brown Sugar', 100, 'g')
-        self.assertTrue(brownSugar.compare_ingredient(self.extraDarkBrownSugar))
-        self.assertTrue(self.extraDarkBrownSugar.compare_ingredient(brownSugar))
+    def test_get_similarity_score(self):
+        brown_sugar = Ingredient("Brown Sugar", 100, "g")
 
-        # same ingredient
-        self.assertTrue(self.flour.compare_ingredient(self.flour))
-        self.assertTrue(self.metricCupFlour.compare_ingredient(self.flour))
+        # Equivalent ingredients have a perfect score
+        self.assertEqual(
+            brown_sugar.get_similarity_score(self.extraDarkBrownSugar),
+            1.0,
+        )
+        self.assertEqual(
+            self.extraDarkBrownSugar.get_similarity_score(brown_sugar),
+            1.0,
+        )
+        self.assertEqual(
+            self.flour.get_similarity_score(self.flour),
+            1.0,
+        )
+        self.assertEqual(
+            self.metricCupFlour.get_similarity_score(self.flour),
+            1.0,
+        )
 
-        # similar ingredients
-        self.assertTrue(self.extraVirginOliveOil.compare_ingredient(self.vegOil))
+        # Related oils share at least one keyword
+        oil_score = self.extraVirginOliveOil.get_similarity_score(self.vegOil)
+        self.assertGreater(oil_score, 0.0)
+        self.assertLess(oil_score, 1.0)
+
+        # Unrelated ingredients have no similarity
+        self.assertEqual(
+            self.flour.get_similarity_score(self.whiteSugar),
+            0.0,
+        )
+
+        # Invalid input is rejected
+        with self.assertRaises(TypeError):
+            self.flour.get_similarity_score("flour")
 
     def test_difference(self):
         self.assertEqual(self.flour.difference(self.twoAndHalfMetricCupFlour), ('-1.5', 'cup'))
