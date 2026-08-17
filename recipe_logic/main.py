@@ -168,9 +168,3 @@ class RecipeExtractionError(Exception):
             f"Sorry, we couldn’t automatically extract the recipe from {url}. "
             f"Please use the 'TEXT' option to enter the recipe manually."
         )
-
-# r2 = "https://bakerbynature.com/the-best-cocoa-fudge-brownies/"
-# r1 = "https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/"
-
-r1 = "https://donalskehan.com/recipes/raspberry-scones/"
-x = RecipeComparator(r1, "url", r1, "url")
