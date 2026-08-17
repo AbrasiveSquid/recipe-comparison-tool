@@ -2,7 +2,6 @@ from pint.compat import dask_array
 
 from recipe_logic.recipe_scraper import fetch_recipe
 from recipe_logic.recipe_class import Recipe
-from urllib.parse import urlparse
 
 class RecipeComparator:
     """
@@ -92,7 +91,6 @@ class RecipeComparator:
         First validates the url, then scrapes the website, then creates a
         python object of a Recipe
         """
-        self._validate_url(url)
         recipeScraped = fetch_recipe(url)
 
         if not recipeScraped:
@@ -138,27 +136,6 @@ class RecipeComparator:
                              "characters")
 
         return True
-
-
-    def _validate_url(self, url:str) -> bool:
-        """
-        verifies url is a valid http/https url and returns True, otherwise
-        raises a ValueError
-
-        Raises:
-            TypeError: is url is not the correct Type
-            ValueError: is url is not a valid http/https URL
-        """
-        if not isinstance(url, str):
-            raise TypeError(f"url must be a string but is a {type(url)}")
-        try:
-            urlparse(url)
-            return True
-        except ValueError:
-            raise ValueError(f"url: {url} is not a valid url, please submit a valid url. Ensure "
-                             "that the url includes http:// or https://")
-
-
 
 class RecipeExtractionError(Exception):
     """Raised when a recipe cannot be extracted from a URL."""
