@@ -233,38 +233,10 @@ class Recipe:
                     ("0 g brown sugar", "50 g brown sugar")]
         """
         ingredientPairs = []
-
-        # while len(firstRecipe) and len(secondRecipe):
-        #     thisIngredient = firstRecipe.pop()
-        #
-        #     for i in range(len(secondRecipe)):
-        #         if thisIngredient.compare_ingredient(secondRecipe[i]):
-        #             ingredientPairs.append(
-        #                 (thisIngredient, secondRecipe.pop(i)))
-        #             break
-        #     else:
-        #         # if no matching ingredient, append an emptied clone ingredient
-        #         duplicateIng = thisIngredient.clone()
-        #         duplicateIng.empty_ingredient()
-        #         ingredientPairs.append((thisIngredient, duplicateIng))
-        #
-        # # add remaining ingredients with an emptied clone ingredient
-        # for ingredient in firstRecipe:
-        #     duplicateIng = ingredient.clone()
-        #     duplicateIng.empty_ingredient()
-        #     ingredientPairs.append((ingredient, duplicateIng))
-        #
-        #
-        # for ingredient in secondRecipe:
-        #     duplicateIng = ingredient.clone()
-        #     duplicateIng.empty_ingredient()
-        #     ingredientPairs.append((duplicateIng, ingredient))
-        # Track indices of ingredients that have already been paired
-
         matchedFirst = set()
         matchedSecond = set()
 
-        # sore for all possible ingredient pairs
+        # score for all possible ingredient pairs
         scoreMatrix = []
         for i, ing1 in enumerate(firstRecipe):
             for j, ing2 in enumerate(secondRecipe):

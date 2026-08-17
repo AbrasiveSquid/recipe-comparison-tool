@@ -623,7 +623,6 @@ class Ingredient:
             raise ValueError("self._state must be either 'solid' or liquid' "
                              f"but is {self._state}")
 
-
     def _convert_to_fraction(self, value: str |int | float | fractions.Fraction) ->fractions.Fraction:
         """
         converts value into a fraction object
@@ -672,7 +671,6 @@ class Ingredient:
 
         return value
 
-
     def __str__(self) -> str:
         """
         returns print friendly str representation of an ingredient
@@ -713,27 +711,6 @@ class Ingredient:
         """
         return (f"{self._kitchen_amount_str()} {self.kitchen_measure()} "
                 f"{self._name}")
-
-    # def compare_ingredient(self, other) -> bool:
-    #     """
-    #     checks if other is a same or similar ingredient as self and returns
-    #     a boolean
-    #
-    #     Precondition:
-    #         other must be the correct type
-    #
-    #     Raises:
-    #         TypeError:
-    #             if other not the correct type
-    #     """
-    #     if not isinstance(other, Ingredient):
-    #         raise TypeError("other must be an Ingredient but is a "
-    #                         f"{type(other)}")
-    #
-    #     for keyword in self._keywords:
-    #         if keyword in other._keywords:
-    #             return True
-    #     return False
 
     def get_similarity_score(self, other: "Ingredient") -> float:
         """
@@ -785,7 +762,7 @@ class Ingredient:
 
         Precondition:
             other must be an Ingredient
-            other must be a similar Ingredient (compare_ingredient returns True)
+            other must have a similarity score greater than 0
             other must the same ._state
 
         Raises:
@@ -807,11 +784,6 @@ class Ingredient:
             amountDiff = self._kitchen_difference(other)
         elif metricMeasure:
             amountDiff = self._metric_difference(other)
-        # elif self._defaultMeasure == other._defaultMeasure:
-        #     if self._defaultMeasure == "metric":
-        #         amountDiff = self._metric_difference(other)
-        #     else:
-        #         amountDiff = self._kitchen_difference(other)
         else:
              # returns kitchen measurement if not equal
             amountDiff = self._kitchen_difference(other)
@@ -826,8 +798,6 @@ class Ingredient:
         """
         amountDiff = self._metricAmount - other._metricAmount
         return amountDiff, self._metricMeasure
-
-
 
     def _kitchen_difference(self, other) -> tuple:
         """
