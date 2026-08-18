@@ -61,4 +61,5 @@ jobs:
           registryPassword: ${{ secrets.GITHUB_TOKEN }}
           containerAppName: recipe-tools
           resourceGroup: recipe-tools-rg
+          environmentVariables: SECRET_KEY=secretref:flask-secret-key
           imageToBuild: ghcr.io/abrasivesquid/recipe-comparison-tool:${{ github.sha }}
