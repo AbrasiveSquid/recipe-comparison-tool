@@ -1,141 +1,197 @@
 # RecipeTools
 
-Compare recipes side-by-side to identify differences in ingredients, quantities, and measurements. 
+[![Test and deploy](https://github.com/AbrasiveSquid/recipe-comparison-tool/actions/workflows/recipe-tools-AutoDeployTrigger-304534ce-8018-48e0-bded-65e8b0437a4b.yml/badge.svg)](https://github.com/AbrasiveSquid/recipe-comparison-tool/actions/workflows/recipe-tools-AutoDeployTrigger-304534ce-8018-48e0-bded-65e8b0437a4b.yml)
 
-Live at **[recipetools.app](https://recipetools.app)**.
+Compare two recipes side by side to identify differences in ingredients, quantities and measurements.
 
----
+**[Try the live application](https://recipetools.app)**
 
-## Overview
+## What it does
 
-RecipeTools parses two recipe inputs—either via URL or raw text—and outputs a comparative breakdown of their ingredients. 
+RecipeTools accepts two recipes as URLs or pasted ingredient lists, normalizes their measurements and pairs equivalent ingredients for comparison.
 
-Features include:
-*   **Ingredient Parsing:** Handles fractions, decimals, standard volumes, masses, and outlier units.
-*   **Density-Aware Conversion:** Embedded lookup table converts solid ingredients to grams and liquid ingredients to milliliters.
-*   **Smart Matching:** Filters adjectives and scores keywords to pair equivalent ingredients.
-*   **Unit Toggling:** Switch individual items or the global view between metric and kitchen units.
-*   **Privacy:** All processing occurs without accounts, tracking, or persistent data storage.
+- **Ingredient parsing:** Handles fractions, decimals, common volume and mass units, and unusual recipe quantities.
+- **Density-aware conversion:** Converts solid ingredients to grams and liquids to millilitres using an embedded density table.
+- **Similarity matching:** Normalizes ingredient names and uses keyword similarity to pair related ingredients.
+- **Flexible units:** Switch all ingredients or individual ingredients between metric and kitchen units.
+- **No application accounts or stored recipe data:** Comparisons are processed without persistent storage.
 
----
+##  Code Highlights
+
+- Matches normalized ingredient keywords using a Jaccard similarity score and greedy one-to-one pairing.
+- Protects server-side URL fetching against SSRF by restricting schemes and ports, rejecting credentials and non-public IP addresses, resolving hostnames before requests, and validating every redirect.
+- Uses multiple recipe-extraction strategies while applying the same URL and redirect protections to each network client.
+- Runs 25 automated tests with 10 URL-validation tests, followed by an application startup check before deployment.
+- Builds and deploys a Docker image through GitHub Actions to Azure Container.
 
 ## Demo
 
-Visit **[recipetools.app](https://recipetools.app)** and try:
-*   [[Link to Brownie Recipe 1](https://www.loveandlemons.com/brownies-recipe/)]
-*   [[Link to Brownie Recipe 2](https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/)]
+Open **[recipetools.app](https://recipetools.app)** and compare these two brownie recipes:
 
----
+- [Love and Lemons brownies](https://www.loveandlemons.com/brownies-recipe/)
+- [Sally's Baking Addiction fudgy brownies](https://sallysbakingaddiction.com/seriously-fudgy-homemade-brownies/)
 
 ## Screenshots
 
-<p><strong>Input View</strong></p>
-<div><kbd><img src="screenshots/input-view.png" alt="Input View" height="400px" /></kbd></div>
+### Recipe input
 
-<p><strong>Input View Dark Mode</strong></p>
-<div><kbd><img src="screenshots/input-view-dark.png" alt="Input View Dark Mode" height="400px" /></kbd></div>
+<kbd><img src="screenshots/input-view.png" alt="RecipeTools URL input screen" width="760" /></kbd>
 
-<p><strong>Comparison Table Showing Matching Ingredients</strong></p>
-<div><kbd><img src="screenshots/comparison-view.png" alt="Comparison Table" height="400px" /></kbd></div>
+### Ingredient comparison
 
-<p><strong>Comparison View - Click Switch Units to change all units from Metric to Kitchen or Vice Versa</strong></p>
-<div><kbd><img src="screenshots/comparison-view-switch-units.png" alt="Switch Units" height="400px" /></kbd></div>
+<kbd><img src="screenshots/comparison-view.png" alt="Comparison table with matched ingredients and quantity differences" width="760" /></kbd>
 
-<p><strong>Input View - If a website can't be scraped an error appears</strong></p>
-<div><kbd><img src="screenshots/error-url.png" alt="URL Error" height="400px" /></kbd></div>
+### Switching measurement systems
 
-<p><strong>Text Input - Text button allows ingredients to be copy and pasted</strong></p>
-<div><kbd><img src="screenshots/input-text.png" alt="Text Input" height="400px" /></kbd></div>
+<kbd><img src="screenshots/comparison-view-switch-units.png" alt="Comparison table after switching measurement units" width="760" /></kbd>
 
-<p><strong>Comparison with Text - Comparison Table Display same information without recipe title</strong></p>
-<div><kbd><img src="screenshots/comparison-text.png" alt="Comparison with Text" height="400px" /></kbd></div>
+<details>
+<summary><strong>More screenshots</strong></summary>
 
-<p><strong>Individual Ingredients can also switch units by clicking on the ingredient in the difference column - Before Switch</strong></p>
-<div><kbd><img src="screenshots/teaspoon-to-gram-tp.png" alt="Before Switch" height="400px" /></kbd></div>
+### Dark mode
 
-<p><strong>After Switch</strong></p>
-<div><kbd><img src="screenshots/teaspoon-to-gram-g.png" alt="After Switch" height="400px" /></kbd></div>
+<kbd><img src="screenshots/input-view-dark.png" alt="RecipeTools input screen in dark mode" width="760" /></kbd>
 
----
+### Manual text input
 
-## How It Works
+<kbd><img src="screenshots/input-text.png" alt="Manual ingredient text input" width="760" /></kbd>
 
-1.  **Input:** Two recipe sources are provided via URL or text.
-2.  **Scraping:** URLs are processed using a lightweight scraper to extract the ingredient lists.
-3.  **Parsing:** `ingredient-parser` processes each line and instantiates an `Ingredient` object.
-4.  **Enrichment:** Density and state (solid/liquid) are assigned, and baseline conversions are executed.
-5.  **Matching:** Each ingredient string is lowercased, stripped of punctuation, and split. Adjectives are removed and plural forms are singularized.
-6.  **Comparison:** Pairs are matched greedily by calculating the Jaccard similarity score. 
-7.  **Rendering:** Absolute differences are calculated and pushed to a Jinja2 template.
+### Text comparison
 
-### Similarity Calculation
+<kbd><img src="screenshots/comparison-text.png" alt="Comparison generated from manually entered ingredient lists" width="760" /></kbd>
 
-Unmatched ingredients reflect a total difference against an empty clone object. Matched pairs are scored using the following formula:
+### URL extraction error
 
-$$score = \frac{|keywords_A \cap keywords_B|}{|keywords_A \cup keywords_B|}$$
+<kbd><img src="screenshots/error-url.png" alt="Error shown when a recipe cannot be extracted from a URL" width="760" /></kbd>
 
----
+### Switching one ingredient
 
-## Tech Stack
+Before:
 
-*   **Backend:** Python 3, Flask, Jinja2
-*   **Parsing:** ingredient-parser, NLTK
-*   **Math:** fractions, inflect
-*   **Frontend:** Vanilla JavaScript, CSS
-*   **Deployment:** Docker Compose
+<kbd><img src="screenshots/teaspoon-to-gram-tp.png" alt="Ingredient difference displayed in teaspoons" width="760" /></kbd>
 
----
+After:
 
-## Project Structure
+<kbd><img src="screenshots/teaspoon-to-gram-g.png" alt="Ingredient difference displayed in grams" width="760" /></kbd>
 
-| Class | Purpose |
-| :--- | :--- |
-| `Ingredient` | Stores name, amount, and measure. Executes unit conversions and difference calculations. |
-| `Recipe` | Wraps a list of `Ingredient` objects. Calls `compare_recipe()` to handle matching logic. |
-| `RecipeComparator` | Validates input, builds `Recipe` instances, and stores the final comparison output. |
+</details>
 
----
+## How it works
 
-## Running Locally
+1. **Input:** The user supplies two recipe URLs, two ingredient lists, or one of each.
+2. **Validation and extraction:** Public HTTP or HTTPS URLs are validated and recipe data is extracted from the returned HTML.
+3. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
+4. **Normalization:** Names are lowercased and cleaned, selected adjectives are removed, plurals are singularized, and units are normalized.
+5. **Enrichment:** Ingredient density and physical state are assigned so kitchen and metric measurements can be converted.
+6. **Matching:** Candidate pairs receive a Jaccard similarity score and are greedily paired from highest to lowest score.
+7. **Comparison:** Quantity differences are calculated and displayed to the user.
 
-1. Clone the repository and navigate to the directory.
+### Similarity calculation
+
+For keyword sets $A$ and $B$:
+
+$$
+\operatorname{score}(A,B) = \frac{|A \cap B|}{|A \cup B|}
+$$
+
+Unmatched ingredients are paired with an empty clone so their full quantity appears as the difference.
+
+## Architecture
+
+| Component | Responsibility |
+| --- | --- |
+| `Ingredient` | Stores an ingredient's normalized name, amount and measurement; performs conversions and difference calculations. |
+| `Recipe` | Holds a collection of ingredients and performs one-to-one similarity matching between recipes. |
+| `RecipeComparator` | Validates input, creates `Recipe` objects and exposes the completed comparison. |
+| `recipe_scraper.py` | Validates public URLs, follows safe redirects and extracts structured recipe data using bounded network requests. |
+| Flask application | Handles requests and renders the input and comparison views with Jinja2. |
+
+## Tech stack
+
+| Area | Technologies |
+| --- | --- |
+| Backend | Python 3.13, Flask, Jinja2, Gunicorn |
+| Parsing and language processing | ingredient-parser, NLTK, inflect |
+| Frontend | Vanilla JavaScript, HTML, CSS |
+| Testing | pytest, unittest |
+| Packaging | Docker, GHCR |
+| CI/CD and hosting | GitHub Actions, Azure OIDC, Azure Container Apps |
+
+## Running locally
+
+### Requirements
+
+- Python 3.13
+- Git
+
+### Setup
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/AbrasiveSquid/recipe-comparison-tool.git
+cd recipe-comparison-tool
+```
+
 2. Create and activate a virtual environment:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  
+source .venv/bin/activate
 ```
-3. Install dependencies:
+
+3. Install the dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
-4. Run the Flask server:
+
+4. Set a local-only Flask secret and start the development server:
 
 ```bash
-flask run
+export SECRET_KEY=local-development-only
+flask --app recipe_comparison run --debug
 ```
 
-*Note: The NLTK data is included in the `nltk_data/` folder. If data is missing, download it manually using `python -m nltk.downloader punkt averaged_perceptron_tagger`.*
+The bundled `nltk_data/` directory contains the language data used by the application.
 
----
+## Testing
+
+Run the complete test suite:
+
+```bash
+SECRET_KEY=test-only-key python -m pytest -q
+```
+
+Verify that the complete Flask application can start with its required configuration:
+
+```bash
+SECRET_KEY=test-only-key python -c 'from recipe_comparison import app; print("Application import passed")'
+```
+
+On every push to `main`, GitHub Actions runs both checks before allowing the Azure deployment job to begin.
+
+## Deployment
+
+The application is packaged as a Docker image and published to GHCR. GitHub Actions authenticates to Azure, deploys the image to Azure Container Apps and injects the Flask secret from the Container Apps secret store. Production secrets are not committed to the repository or embedded in the image.
 
 ## Limitations
 
-*   **Scraper Reliability:** URL extraction relies on standard HTML structures and will fail on non-standard recipe blogs.
-*   **Density Table:** Unknown ingredients default to 240 g/cup (water density).
-*   **Parser Accuracy:** `ingredient-parser` can misinterpret unusual formatting.
-*   **Fractions:** Unit conversion rounds to a denominator of 48 for kitchen measures. Extremely small values may be lost in rounding.
-
----
+- **Scraper reliability:** Some websites block automated requests or do not expose usable structured recipe data. Manual text input is available as a fallback.
+- **Density coverage:** Ingredients absent from the density table use a default conversion value (water density).
+- **Parser accuracy:** Unusual ingredient formatting can be interpreted incorrectly.
+- **Greedy matching:** Ingredient pairing selects the highest available similarity score rather than calculating a globally optimal assignment.
+- **Rounding:** Kitchen measurements are limited to a denominator of 48, so extremely small differences may be rounded away.
 
 ## Contributing
 
-Open a pull request or issue on GitHub for:
-*   Bug reports and edge-case ingredient strings.
-*   Density JSON additions.
-*   Keyword filtering and algorithm improvements.
+Issues and pull requests are welcome, particularly for:
+
+- Edge-case ingredient formats
+- Density-table additions
+- Keyword normalization and matching improvements
+- Recipe extraction compatibility
 
 ## License
 
-Open source under the MIT License.
+This project is available under the MIT License.
