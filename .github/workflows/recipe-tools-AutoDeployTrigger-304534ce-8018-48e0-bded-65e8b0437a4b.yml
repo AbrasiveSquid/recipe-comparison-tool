@@ -32,6 +32,8 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
+      - name: Verify application startup
+        run: python -c "from recipe_comparison import app"
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -63,3 +65,11 @@ jobs:
           resourceGroup: recipe-tools-rg
           environmentVariables: SECRET_KEY=secretref:flask-secret-key
           imageToBuild: ghcr.io/abrasivesquid/recipe-comparison-tool:${{ github.sha }}
+          targetPort: 8000
+
+      - name: Remove temporary registry credentials
+        run: |
+          az containerapp registry remove \
+            --name recipe-tools \
+            --resource-group recipe-tools-rg \
+            --server ghcr.io
