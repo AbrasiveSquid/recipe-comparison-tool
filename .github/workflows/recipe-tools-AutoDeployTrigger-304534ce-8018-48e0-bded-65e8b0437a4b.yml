@@ -1,4 +1,4 @@
-name: Trigger auto deployment for recipe-tools
+name: Test and deploy recipe-tools
 
 on:
   push:
@@ -7,7 +7,33 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      SECRET_KEY: ci-test-only-key
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
   build-and-deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     permissions:
@@ -17,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Azure Login
         uses: azure/login@v2
