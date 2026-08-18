@@ -88,10 +88,10 @@ After:
 
 ### Similarity calculation
 
-For keyword sets $A$ and $B$:
+For keyword sets $A$ and $B$, the similarity score $S$ is:
 
 $$
-\operatorname{score}(A,B) = \frac{|A \cap B|}{|A \cup B|}
+S(A,B) = \frac{|A \cap B|}{|A \cup B|}
 $$
 
 Unmatched ingredients are paired with an empty clone so their full quantity appears as the difference.
