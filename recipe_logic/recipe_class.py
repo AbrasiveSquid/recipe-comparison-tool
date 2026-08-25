@@ -192,8 +192,8 @@ class Recipe:
         # create list of tuples with ingredient in pos 0 and 1, difference in 2
         result = []
         for pair in ingredientPairs:
-            if pair[0].defMeasure == pair[1].defMeasure:
-                defaultMeasure = pair[0].defMeasure
+            if pair[0].defMeasure() == pair[1].defMeasure():
+                defaultMeasure = pair[0].defMeasure()
             else:
                 defaultMeasure = "kitchen" # defaults to kitchen if not same
 
