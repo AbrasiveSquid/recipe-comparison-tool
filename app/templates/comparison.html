@@ -371,6 +371,84 @@
         padding-right: 48px;   /* space for the clear button */
     }
 
+    .ocr-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    }
+
+    .ocr-image-input {
+        font-family: monospace;
+        font-size: 12px;
+        color: #555;
+    }
+
+    .ocr-image-input::file-selector-button {
+        background-color: #f1eee6;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin-right: 8px;
+        font-family: monospace;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .ocr-image-input::file-selector-button:hover {
+        background-color: #e4e0d7;
+    }
+
+    .ocr-btn {
+        background-color: #2c4c70;
+        border: none;
+        border-radius: 4px;
+        padding: 9px 14px;
+        color: white;
+        font-family: monospace;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .ocr-btn:hover {
+        background-color: #cda45e;
+        color: #1a1814;
+    }
+
+    .ocr-btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+    }
+
+    .ocr-status {
+        font-family: monospace;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .ocr-status.loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .ocr-status.loading::before {
+        content: "";
+        width: 14px;
+        height: 14px;
+        border: 2px solid #ccc;
+        border-top-color: #2c4c70;
+        border-radius: 50%;
+        animation: ocr-spin 0.8s linear infinite;
+    }
+
+    @keyframes ocr-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
     @media (max-width: 600px) {
         .table-controls {
             justify-content: center;
@@ -424,6 +502,18 @@
                     </div>
                     <div class="mode-text-field" style="display: none;">
                         <textarea name="firstRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
+
+                        <div class="ocr-controls">
+                            <input type="file"
+                                   class="ocr-image-input"
+                                   accept="image/*">
+
+                            <button type="button" class="ocr-btn">
+                                Extract Text From Image
+                            </button>
+
+                            <span class="ocr-status"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -465,6 +555,18 @@
                     </div>
                     <div class="input-field mode-text-field" style="display: none;">
                         <textarea name="secondRecipeText" class="recipe-input" rows="8" placeholder="2 cups all-purpose flour&#10;1 tbsp olive oil&#10;½ tsp kosher salt"></textarea>
+
+                        <div class="ocr-controls">
+                            <input type="file"
+                                   class="ocr-image-input"
+                                   accept="image/*">
+
+                            <button type="button" class="ocr-btn">
+                                Extract Text From Image
+                            </button>
+
+                            <span class="ocr-status"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -653,6 +755,48 @@
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
     });
+
+    document.querySelectorAll('.ocr-btn').forEach(button => {
+    button.addEventListener('click', async function() {
+        const card = this.closest('.recipe-card');
+        const fileInput = card.querySelector('.ocr-image-input');
+        const textarea = card.querySelector('.mode-text-field textarea');
+        const status = card.querySelector('.ocr-status');
+
+        if (!fileInput.files.length) {
+            status.textContent = 'Choose an image first.';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        status.textContent = 'Extracting...';
+        status.classList.add('loading');
+        button.disabled = true;
+
+        try {
+            const response = await fetch('/ocr', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'OCR failed');
+            }
+
+            textarea.value = data.text;
+            status.textContent = 'Text extracted.';
+        } catch (error) {
+            status.textContent = error.message;
+        } finally {
+            status.classList.remove('loading');
+            button.disabled = false;
+        }
+    });
+});
 </script>
 
 {% endblock %}

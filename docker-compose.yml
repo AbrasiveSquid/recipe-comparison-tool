@@ -5,4 +5,6 @@ services:
       - "8000:8000"
     restart: unless-stopped
     environment:
-      - Secret_Key=${Secret_Key}
+      - SECRET_KEY=${SECRET_KEY}
+      - AZURE_OCR_ENDPOINT=${AZURE_OCR_ENDPOINT}
+      - AZURE_OCR_KEY=${AZURE_OCR_KEY}

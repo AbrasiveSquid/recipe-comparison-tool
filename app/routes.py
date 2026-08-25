@@ -1,7 +1,8 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator, RecipeExtractionError
+from recipe_logic.ocr import extract_text
 
 
 @app.route("/")
@@ -67,3 +68,22 @@ def comparison():
                            title="Compare Recipes", form=form,
                            results = comparisonData,
                            recipe1=recipe1, recipe2=recipe2)
+
+@app.route("/ocr", methods=["POST"])
+def ocr():
+    image = request.files.get("image")
+
+    if image is None or image.filename == "":
+        return jsonify({"error": "No image provided"}), 400
+
+    try:
+        text = extract_text(image.stream)
+    except Exception:
+        app.logger.exception("OCR failed")
+        return jsonify({"error": "Could not extract text from image"}), 500
+
+    return jsonify({"text": text})
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({"error": "Image must be 10 MB or smaller"}), 413
