@@ -87,11 +87,10 @@ After:
 2. **Image extraction:** Uploaded images are processed with Azure Document Intelligence and the extracted text is placed into the editable text field.
 3. **Validation and extraction:** Public HTTP or HTTPS URLs are validated and recipe data is extracted from the returned HTML.
 4. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
-5. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
-6. **Normalization:** Names are lowercased and cleaned, selected adjectives are removed, plurals are singularized, and units are normalized.
-7. **Enrichment:** Ingredient density and physical state are assigned so kitchen and metric measurements can be converted.
-8. **Matching:** Candidate pairs receive a Jaccard similarity score and are greedily paired from highest to lowest score.
-9. **Comparison:** Quantity differences are calculated and displayed to the user.
+5. **Normalization:** Names are lowercased and cleaned, selected adjectives are removed, plurals are singularized, and units are normalized.
+6. **Enrichment:** Ingredient density and physical state are assigned so kitchen and metric measurements can be converted.
+7. **Matching:** Candidate pairs receive a Jaccard similarity score and are greedily paired from highest to lowest score.
+8. **Comparison:** Quantity differences are calculated and displayed to the user.
 
 ### Similarity calculation
 
