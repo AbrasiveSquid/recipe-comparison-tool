@@ -8,8 +8,9 @@ Compare two recipes side by side to identify differences in ingredients, quantit
 
 ## What it does
 
-RecipeTools accepts two recipes as URLs or pasted ingredient lists, normalizes their measurements and pairs equivalent ingredients for comparison.
+RecipeTools accepts two recipes as URLs or pasted ingredient lists, or images of ingredients, normalizes their measurements and pairs equivalent ingredients for comparison.
 
+- **Image extraction:** Uses OCR to extract editable ingredient text from recipe screenshots or photos.
 - **Ingredient parsing:** Handles fractions, decimals, common volume and mass units, and unusual recipe quantities.
 - **Density-aware conversion:** Converts solid ingredients to grams and liquids to millilitres using an embedded density table.
 - **Similarity matching:** Normalizes ingredient names and uses keyword similarity to pair related ingredients.
@@ -19,9 +20,13 @@ RecipeTools accepts two recipes as URLs or pasted ingredient lists, normalizes t
 ##  Code Highlights
 
 - Matches normalized ingredient keywords using a Jaccard similarity score and greedy one-to-one pairing.
+- Extracts ingredient text from uploaded recipe images using Azure Document
+  Intelligence, with corrections for common OCR fraction errors.
+- Tests OCR integration with mocked Azure calls so the automated test suite does
+  not make external OCR requests.
 - Protects server-side URL fetching against SSRF by restricting schemes and ports, rejecting credentials and non-public IP addresses, resolving hostnames before requests, and validating every redirect.
 - Uses multiple recipe-extraction strategies while applying the same URL and redirect protections to each network client.
-- Runs 25 automated tests with 10 URL-validation tests, followed by an application startup check before deployment.
+- Runs automated unit and integration tests followed by an application startup check before deployment.
 - Builds and deploys a Docker image through GitHub Actions to Azure Container.
 
 ## Demo
@@ -78,13 +83,15 @@ After:
 
 ## How it works
 
-1. **Input:** The user supplies two recipe URLs, two ingredient lists, or one of each.
-2. **Validation and extraction:** Public HTTP or HTTPS URLs are validated and recipe data is extracted from the returned HTML.
-3. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
-4. **Normalization:** Names are lowercased and cleaned, selected adjectives are removed, plurals are singularized, and units are normalized.
-5. **Enrichment:** Ingredient density and physical state are assigned so kitchen and metric measurements can be converted.
-6. **Matching:** Candidate pairs receive a Jaccard similarity score and are greedily paired from highest to lowest score.
-7. **Comparison:** Quantity differences are calculated and displayed to the user.
+1. **Input:** The user supplies each recipe as a URL, pasted ingredient list, or  image.
+2. **Image extraction:** Uploaded images are processed with Azure Document Intelligence and the extracted text is placed into the editable text field.
+3. **Validation and extraction:** Public HTTP or HTTPS URLs are validated and recipe data is extracted from the returned HTML.
+4. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
+5. **Parsing:** Each ingredient line is parsed into an `Ingredient` object containing its name, amount and measurement.
+6. **Normalization:** Names are lowercased and cleaned, selected adjectives are removed, plurals are singularized, and units are normalized.
+7. **Enrichment:** Ingredient density and physical state are assigned so kitchen and metric measurements can be converted.
+8. **Matching:** Candidate pairs receive a Jaccard similarity score and are greedily paired from highest to lowest score.
+9. **Comparison:** Quantity differences are calculated and displayed to the user.
 
 ### Similarity calculation
 
@@ -104,6 +111,7 @@ Unmatched ingredients are paired with an empty clone so their full quantity appe
 | `Recipe` | Holds a collection of ingredients and performs one-to-one similarity matching between recipes. |
 | `RecipeComparator` | Validates input, creates `Recipe` objects and exposes the completed comparison. |
 | `recipe_scraper.py` | Validates public URLs, follows safe redirects and extracts structured recipe data using bounded network requests. |
+| `ocr.py` | Sends uploaded recipe images to Azure Document Intelligence and normalizes common OCR fraction errors. |
 | Flask application | Handles requests and renders the input and comparison views with Jinja2. |
 
 ## Tech stack
@@ -114,6 +122,7 @@ Unmatched ingredients are paired with an empty clone so their full quantity appe
 | Parsing and language processing | ingredient-parser, NLTK, inflect |
 | Frontend | Vanilla JavaScript, HTML, CSS |
 | Testing | pytest, unittest |
+| OCR | Azure AI Document Intelligence |
 | Packaging | Docker, GHCR |
 | CI/CD and hosting | GitHub Actions, Azure OIDC, Azure Container Apps |
 
@@ -151,6 +160,12 @@ python -m pip install -r requirements.txt
 ```bash
 export SECRET_KEY=local-development-only
 flask --app recipe_comparison run --debug
+
+Image OCR additionally requires an Azure Document Intelligence resource:
+- Only required for image extraction
+```bash
+export AZURE_OCR_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
+export AZURE_OCR_KEY=your-key
 ```
 
 The bundled `nltk_data/` directory contains the language data used by the application.
@@ -173,7 +188,7 @@ On every push to `main`, GitHub Actions runs both checks before allowing the Azu
 
 ## Deployment
 
-The application is packaged as a Docker image and published to GHCR. GitHub Actions authenticates to Azure, deploys the image to Azure Container Apps and injects the Flask secret from the Container Apps secret store. Production secrets are not committed to the repository or embedded in the image.
+The application is packaged as a Docker image and published to GHCR. GitHub Actions authenticates to Azure and deploys the image to Azure Container Apps. The flask secret and Azure OCR keys are stored as container apps secrets and referenced through environment variables. Production secrets are not committed to the repository or embedded in the image.
 
 ## Limitations
 
@@ -182,6 +197,7 @@ The application is packaged as a Docker image and published to GHCR. GitHub Acti
 - **Parser accuracy:** Unusual ingredient formatting can be interpreted incorrectly.
 - **Greedy matching:** Ingredient pairing selects the highest available similarity score rather than calculating a globally optimal assignment.
 - **Rounding:** Kitchen measurements are limited to a denominator of 48, so extremely small differences may be rounded away.
+- **OCR accuracy:** Image extraction can occasionally misread ingredient text or quantities. Extracted text is shown in the editable text field so it can be reviewed before comparison.
 
 ## Contributing
 
