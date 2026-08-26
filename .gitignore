@@ -7,3 +7,4 @@ __pycache__/
 .pytest_cache/
 brownie*
 azure_ocr_manual.py
+.env.neon
