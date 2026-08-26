@@ -4,6 +4,7 @@ from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator, RecipeExtractionError
 from recipe_logic.ocr import extract_text
 from recipe_logic.tracking import track_event
+from app.feedback import send_feedback
 
 
 @app.route("/")
@@ -91,6 +92,26 @@ def ocr():
         return jsonify({"error": "Could not extract text from image"}), 500
 
     return jsonify({"text": text})
+
+@app.route("/feedback", methods=["POST"])
+@limiter.limit("3 per hour")
+def feedback():
+    data = request.get_json(silent=True) or {}
+    message = data.get("message", "").strip()
+
+    if not message:
+        return jsonify({"error": "Feedback message is required"}), 400
+
+    if len(message) > 2000:
+        return jsonify({"error": "Feedback message is too long"}), 400
+
+    try:
+        send_feedback(message)
+    except Exception:
+        app.logger.exception("Failed to send feedback")
+        return jsonify({"error": "Could not send feedback"}), 500
+
+    return jsonify({"message": "Feedback sent"}), 200
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
