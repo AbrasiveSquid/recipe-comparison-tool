@@ -3,6 +3,7 @@ from app import app, limiter
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator, RecipeExtractionError
 from recipe_logic.ocr import extract_text
+from recipe_logic.tracking import track_event
 
 
 @app.route("/")
@@ -31,6 +32,7 @@ def comparison():
         form = RecipeForm(formdata=form_data)
     else:
         form = RecipeForm()
+        track_event("page_view")
 
     comparisonData = None
     recipe1 = None
@@ -54,6 +56,7 @@ def comparison():
                 comparisonData = comparator.get_comparison()
                 recipe1 = comparator.get_first_recipe()
                 recipe2 = comparator.get_second_recipe()
+                track_event("comparison")
         except RecipeExtractionError as e:
             app.logger.error(f"Scraping failed for URL: {e.url}")
             flash(str(e), "error")
@@ -81,7 +84,9 @@ def ocr():
 
     try:
         text = extract_text(image.stream)
+        track_event("ocr_success")
     except Exception:
+        track_event("ocr_failure")
         app.logger.exception("OCR failed")
         return jsonify({"error": "Could not extract text from image"}), 500
 

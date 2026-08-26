@@ -10,6 +10,10 @@ class TestOcrRoute(unittest.TestCase):
         app.config["TESTING"] = True
         self.client = app.test_client()
 
+        self.tracking_patcher = patch("app.routes.track_event")
+        self.mock_track_event = self.tracking_patcher.start()
+        self.addCleanup(self.tracking_patcher.stop)
+
     def test_rejects_missing_image(self):
         response = self.client.post("/ocr")
 
