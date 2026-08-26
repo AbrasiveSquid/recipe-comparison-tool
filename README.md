@@ -15,7 +15,7 @@ RecipeTools accepts two recipes as URLs or pasted ingredient lists, or images of
 - **Density-aware conversion:** Converts solid ingredients to grams and liquids to millilitres using an embedded density table.
 - **Similarity matching:** Normalizes ingredient names and uses keyword similarity to pair related ingredients.
 - **Flexible units:** Switch all ingredients or individual ingredients between metric and kitchen units.
-- **No application accounts or stored recipe data:** Comparisons are processed without persistent storage.
+- **Privacy-focused usage tracking:** Recipe contents, uploaded images, recipe URLs and IP addresses are not stored. Only anonymous usage events such as page views, completed comparisons and OCR success/failure counts are recorded.
 
 ##  Code Highlights
 
@@ -28,6 +28,7 @@ RecipeTools accepts two recipes as URLs or pasted ingredient lists, or images of
 - Uses multiple recipe-extraction strategies while applying the same URL and redirect protections to each network client.
 - Runs automated unit and integration tests followed by an application startup check before deployment.
 - Builds and deploys a Docker image through GitHub Actions to Azure Container.
+- Records anonymous usage counts in PostgreSQL without storing recipe contents, uploaded images, URLs, IP addresses or user identifiers.
 
 ## Demo
 
@@ -112,6 +113,7 @@ Unmatched ingredients are paired with an empty clone so their full quantity appe
 | `recipe_scraper.py` | Validates public URLs, follows safe redirects and extracts structured recipe data using bounded network requests. |
 | `ocr.py` | Sends uploaded recipe images to Azure Document Intelligence and normalizes common OCR fraction errors. |
 | Flask application | Handles requests and renders the input and comparison views with Jinja2. |
+| `tracking.py` | Records anonymous usage events in PostgreSQL without storing recipe or user data. |
 
 ## Tech stack
 
@@ -124,6 +126,7 @@ Unmatched ingredients are paired with an empty clone so their full quantity appe
 | OCR | Azure AI Document Intelligence |
 | Packaging | Docker, GHCR |
 | CI/CD and hosting | GitHub Actions, Azure OIDC, Azure Container Apps |
+| Database | PostgreSQL (Neon) |
 
 ## Running locally
 
@@ -159,6 +162,7 @@ python -m pip install -r requirements.txt
 ```bash
 export SECRET_KEY=local-development-only
 flask --app recipe_comparison run --debug
+```
 
 Image OCR additionally requires an Azure Document Intelligence resource:
 - Only required for image extraction
@@ -166,6 +170,14 @@ Image OCR additionally requires an Azure Document Intelligence resource:
 export AZURE_OCR_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
 export AZURE_OCR_KEY=your-key
 ```
+
+Anonymous usage tracking additionally requires a PostgreSQL database:
+
+```bash
+export DATABASE_URL=postgresql://...
+```
+
+The application continues to function if `DATABASE_URL` is not configured; usage events just won't be recorded.
 
 The bundled `nltk_data/` directory contains the language data used by the application.
 
@@ -187,7 +199,7 @@ On every push to `main`, GitHub Actions runs both checks before allowing the Azu
 
 ## Deployment
 
-The application is packaged as a Docker image and published to GHCR. GitHub Actions authenticates to Azure and deploys the image to Azure Container Apps. The flask secret and Azure OCR keys are stored as container apps secrets and referenced through environment variables. Production secrets are not committed to the repository or embedded in the image.
+The application is packaged as a Docker image and published to GHCR. GitHub Actions authenticates to Azure and deploys the image to Azure Container Apps. The flask secret, Azure OCR keys, and PostgresSQL connection strings are stored as container apps secrets and referenced through environment variables. Anonymous usage events are stored in a Neon PostgresSQL database. Production secrets are not committed to the repository or embedded in the image.
 
 ## Limitations
 
@@ -197,6 +209,14 @@ The application is packaged as a Docker image and published to GHCR. GitHub Acti
 - **Greedy matching:** Ingredient pairing selects the highest available similarity score rather than calculating a globally optimal assignment.
 - **Rounding:** Kitchen measurements are limited to a denominator of 48, so extremely small differences may be rounded away.
 - **OCR accuracy:** Image extraction can occasionally misread ingredient text or quantities. Extracted text is shown in the editable text field so it can be reviewed before comparison.
+
+## Privacy
+
+RecipeTools does not require accounts and does not persist recipe contents, uploaded images, recipe URLs or IP addresses.
+
+The application records anonymous usage to measure basic usage, including page views, completed comparisons and OCR success/failure counts. These events contain only an event type and timestamp.
+
+IP addresses are temporarily used in memory for OCR rate limiting but are not stored in the analytics database.
 
 ## Contributing
 
