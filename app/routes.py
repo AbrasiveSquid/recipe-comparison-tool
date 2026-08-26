@@ -5,7 +5,7 @@ from recipe_logic.main import RecipeComparator, RecipeExtractionError
 from recipe_logic.ocr import extract_text
 from recipe_logic.tracking import track_event
 from app.feedback import send_feedback
-
+from urllib.parse import urlparse
 
 @app.route("/")
 @app.route("/index")
@@ -33,7 +33,7 @@ def comparison():
         form = RecipeForm(formdata=form_data)
     else:
         form = RecipeForm()
-        track_event("page_view")
+        track_event("page_view", get_traffic_source())
 
     comparisonData = None
     recipe1 = None
@@ -92,6 +92,34 @@ def ocr():
         return jsonify({"error": "Could not extract text from image"}), 500
 
     return jsonify({"text": text})
+
+def get_traffic_source():
+    utm_source = request.args.get("utm_source", "").lower()
+
+    known_sources = {
+        "reddit",
+        "linkedin",
+        "hackernews",
+    }
+
+    if utm_source in known_sources:
+        return utm_source
+
+    if request.referrer:
+        hostname = urlparse(request.referrer).hostname or ""
+
+        if "google." in hostname:
+            return "google"
+        if "reddit.com" in hostname:
+            return "reddit"
+        if "linkedin.com" in hostname:
+            return "linkedin"
+        if "ycombinator.com" in hostname:
+            return "hackernews"
+
+        return "other"
+
+    return "direct"
 
 @app.route("/feedback", methods=["POST"])
 @limiter.limit("3 per hour")

@@ -14,7 +14,7 @@ VALID_EVENTS = {
     "ocr_rate_limited",
 }
 
-def track_event(event_type: str) -> bool:
+def track_event(event_type: str, source: str | None = None) -> bool:
     if event_type not in VALID_EVENTS:
         raise ValueError(f"Unknown event type: {event_type}")
 
@@ -28,8 +28,11 @@ def track_event(event_type: str) -> bool:
         with psycopg.connect(database_url) as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO events (event_type) VALUES (%s)",
-                    (event_type,),
+                    """
+                    INSERT INTO events (event_type, source)
+                    VALUES (%s, %s)
+                    """,
+                    (event_type, source),
                 )
 
         return True
