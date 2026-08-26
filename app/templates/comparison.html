@@ -786,16 +786,28 @@
                 body: formData
             });
 
-            const data = await response.json();
+            let data;
+
+            try {
+                data = await response.json();
+            } catch {
+                throw new Error('Image extraction failed. Please try again.');
+            }
 
             if (!response.ok) {
-                throw new Error(data.error || 'OCR failed');
+                throw new Error(
+                    data.error || 'Image extraction failed. Please try again.'
+                );
             }
 
             textarea.value = data.text;
             status.textContent = 'Text extracted.';
         } catch (error) {
-            status.textContent = error.message;
+            if (error.message === 'Image must be 10 MB or smaller') {
+                status.textContent = error.message;
+            } else {
+                status.textContent = 'Image extraction failed. Please try again.';
+            }
         } finally {
             status.classList.remove('loading');
             button.disabled = false;
