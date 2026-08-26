@@ -79,3 +79,41 @@ class TestOcrRoute(unittest.TestCase):
             response.get_json(),
             {"error": "Image must be 10 MB or smaller"},
         )
+    @patch("app.routes.extract_text")
+    def test_rate_limits_ocr_requests(self, mock_extract_text):
+        mock_extract_text.return_value = "1 cup flour"
+
+        headers = {"X-Forwarded-For": "203.0.113.10"}
+
+        for _ in range(5):
+            response = self.client.post(
+                "/ocr",
+                data={
+                    "image": (
+                        io.BytesIO(b"fake image"),
+                        "recipe.png",
+                    )
+                },
+                content_type="multipart/form-data",
+                headers=headers,
+            )
+
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            "/ocr",
+            data={
+                "image": (
+                    io.BytesIO(b"fake image"),
+                    "recipe.png",
+                )
+            },
+            content_type="multipart/form-data",
+            headers=headers,
+        )
+
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Too many image requests. Please try again later."},
+        )

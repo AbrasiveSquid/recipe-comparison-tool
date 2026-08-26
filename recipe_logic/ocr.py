@@ -1,13 +1,8 @@
 import os
 import re
-from dotenv import load_dotenv
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
-
-
-load_dotenv()
-
 
 def _get_client():
     """

@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
-from app import app
+from app import app, limiter
 from app.forms import RecipeForm
 from recipe_logic.main import RecipeComparator, RecipeExtractionError
 from recipe_logic.ocr import extract_text
@@ -70,6 +70,9 @@ def comparison():
                            recipe1=recipe1, recipe2=recipe2)
 
 @app.route("/ocr", methods=["POST"])
+@limiter.limit("5 per minute")
+@limiter.limit("30 per hour")
+@limiter.limit("100 per hour", key_func=lambda: "ocr-global")
 def ocr():
     image = request.files.get("image")
 
@@ -87,3 +90,9 @@ def ocr():
 @app.errorhandler(413)
 def request_entity_too_large(error):
     return jsonify({"error": "Image must be 10 MB or smaller"}), 413
+
+@app.errorhandler(429)
+def rate_limit_exceeded(error):
+    return jsonify({
+        "error": "Too many image requests. Please try again later."
+    }), 429
